@@ -14,16 +14,16 @@ SECRET_KEY = 'SOMESCRETKEYHERE'
 
 ALLOWED_HOSTS = ['127.0.0.1']
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'dbname',
-        'USER': 'username',
-        'PASSWORD': 'password',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-        'OPTIONS': {
-            'options': '-c search_path=admin,cso'
-        }
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         'NAME': 'dbname',
+#         'USER': 'username',
+#         'PASSWORD': 'password',
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432',
+#         'OPTIONS': {
+#             'options': '-c search_path=admin,cso'
+#         }
+#     }
+# }
