@@ -10,8 +10,8 @@ from rest_framework.exceptions import ValidationError, ParseError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from apps.mtnhub.serializers import ObservationListSerializer
-from apps.mtnhub.types import GET_FUNCTIONS
+from apps.cso.serializers import ObservationListSerializer
+from apps.cso.types import GET_FUNCTIONS
 
 
 def parse_date(value):

@@ -13,10 +13,12 @@ from rest_framework.serializers import (Serializer,
 
 class ObservationSerializer(Serializer):
     id = CharField()
+    source_id = CharField()
     name = CharField()
     reported_at = DateTimeField()
     coords = ListField()
     snow_depth = FloatField()
+    source = CharField()
 
 
 class ObservationListSerializer(Serializer):

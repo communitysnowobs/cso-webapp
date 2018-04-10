@@ -7,7 +7,7 @@ import requests
 import datetime
 import pandas as pd
 
-from apps.mtnhub.models import (Observation, ObservationList, BBOX)
+from apps.cso.models import (Observation, ObservationList, BBOX)
 
 
 OBSERVATION_TYPE = 'snow_depth'
@@ -15,6 +15,7 @@ BASE_URL = 'https://api.mountainhub.com/timeline'
 HEADER = {
     'Accept-version': '1'
 }
+SOURCE = 'mtnhub'
 
 
 def parse_date(value):
@@ -22,17 +23,19 @@ def parse_date(value):
 
 
 def parse_record(item):
-    return Observation(id=item.author_id,
+    return Observation(id=item.id,
+                       source_id=item.obs_id,
                        name=item.author_name,
                        reported_at=parse_date(item.timestamp),
                        coords=[item.lat, item.lng],
-                       snow_depth=item.snow_depth)
+                       snow_depth=item.snow_depth,
+                       source=SOURCE)
 
 
 def parse_records(results):
     observations = []
 
-    for res in results:
+    for idx, res in enumerate(results):
         observation = res['observation']
         actor = res['actor']
         obs_data = {}
@@ -40,7 +43,8 @@ def parse_records(results):
             obs_data['author_name'] = actor['full_name']
         elif 'fullName' in actor.keys():
             obs_data['author_name'] = actor['fullName']
-        obs_data['author_id'] = actor['_id']
+        obs_data['id'] = idx
+        obs_data['obs_id'] = observation['_id']
         obs_data['timestamp'] = int(observation['reported_at'])
         obs_data['lat'] = observation['location'][1]
         obs_data['lng'] = observation['location'][0]
@@ -52,10 +56,9 @@ def parse_records(results):
 
         observations.append(obs_data)
 
-    df = pd.DataFrame.from_records(observations)
-    df.dropna(inplace=True)
+    df = pd.DataFrame.from_records(observations).dropna()
 
-    return df
+    return df[df['snow_depth'] != 'undefined']
 
 
 def prepare_bbox(north_east_lat, north_east_lng, south_west_lat, south_west_lng):
@@ -78,7 +81,7 @@ def get_records(**kwargs):
     params = {
         'publisher': 'all',
         'obs_type': 'snow_conditions',
-        'limit': 9999
+        'limit': 1000
     }
 
     if north_east_lat and north_east_lng \
@@ -106,5 +109,5 @@ def get_records(**kwargs):
         obs_type=OBSERVATION_TYPE,
         date_start=parse_date(data['pagination']['before']),
         date_end=parse_date(data['pagination']['after']),
-        results=[parse_record(item) for i, item in obsdf.iterrows()],
+        results=[parse_record(i, item) for i, item in obsdf.iterrows()],
         count=count)

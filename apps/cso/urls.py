@@ -8,5 +8,5 @@ from django.conf.urls import url
 from apps.mtnhub import views
 
 urlpatterns = [
-    url(r'^getobs$', views.getobs, name='mtnhub_api'),
+    url(r'^observations$', views.getobs, name='cso_api'),
 ]

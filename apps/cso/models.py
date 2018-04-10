@@ -6,12 +6,14 @@ from __future__ import division
 
 class Observation(object):
 
-    def __init__(self, id, name, reported_at, coords, snow_depth):
+    def __init__(self, id, source_id, name, reported_at, coords, snow_depth, source):
         self.id = id
+        self.source_id = source_id
         self.name = name
         self.reported_at = reported_at
         self.coords = coords
         self.snow_depth = snow_depth
+        self.source = source
 
 
 class ObservationList(object):
