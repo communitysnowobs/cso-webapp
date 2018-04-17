@@ -3,3 +3,5 @@ djangorestframework
 psycopg2
 geopandas
 requests
+pandas
+lxml

@@ -109,5 +109,5 @@ def get_records(**kwargs):
         obs_type=OBSERVATION_TYPE,
         date_start=parse_date(data['pagination']['before']),
         date_end=parse_date(data['pagination']['after']),
-        results=[parse_record(i, item) for i, item in obsdf.iterrows()],
+        results=[parse_record(item) for i, item in obsdf.iterrows()],
         count=count)

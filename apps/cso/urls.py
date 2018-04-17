@@ -5,7 +5,7 @@ from __future__ import division
 
 from django.conf.urls import url
 
-from apps.mtnhub import views
+from apps.cso import views
 
 urlpatterns = [
     url(r'^observations$', views.getobs, name='cso_api'),

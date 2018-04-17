@@ -28,8 +28,8 @@ class ObservationList(object):
 
 class BBOX(object):
 
-    def __init__(self, north_east_lat, north_east_lng, south_west_lat, south_west_lng):
-        self.north_east_lat = north_east_lat
-        self.north_east_lng = north_east_lng
-        self.south_west_lat = south_west_lat
-        self.south_west_lng = south_west_lng
+    def __init__(self, xmin, ymin, xmax, ymax):
+        self.xmin = xmin
+        self.ymin = ymin
+        self.xmax = xmax
+        self.ymax = ymax
