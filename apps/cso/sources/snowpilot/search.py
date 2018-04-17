@@ -8,6 +8,8 @@ import itertools
 import pandas as pd
 import datetime
 
+from django.core.cache import cache
+
 from geopandas import GeoDataFrame
 import geopandas as gpd
 
@@ -113,14 +115,10 @@ def _get_online_sp():
         by='time').reset_index(drop='index')
     cleaned_df.loc[:, 'lon'] = cleaned_df['lon'].apply(lambda x: float(x))
     cleaned_df.loc[:, 'lat'] = cleaned_df['lat'].apply(lambda x: float(x))
-    geometry = [Point(xy) for xy in zip(cleaned_df['lon'], cleaned_df['lat'])]
-    gdf_sp = GeoDataFrame(cleaned_df, geometry=geometry, crs={'init': 'epsg:4326'})
-    return gdf_sp
+    return cleaned_df
 
 
 def search(**kwargs):
-    # TODO: Make this more efficient, right now getting everything seems inefficient
-    online_sp = _get_online_sp()
 
     obs_type = kwargs.get('obstype', 'snow_depth')
     start_date = kwargs.get('start_date')
@@ -128,10 +126,23 @@ def search(**kwargs):
     aoi = kwargs.get('aoi')
     limit = kwargs.get('limit')
 
+    key = 'cso_{}_{}'.format(SOURCE_NAME, obs_type)
+    expiry = 300 # cache for 5 minutes
+    data = cache.get(key)
+    if data:
+        cleaned_df = pd.DataFrame.from_records(data)
+    else:
+        # TODO: Make this more efficient, right now getting everything seems inefficient
+        cleaned_df = _get_online_sp()
+        cache.set(key, cleaned_df.to_dict(orient='records'), timeout=expiry)
+
+    geometry = [Point(xy) for xy in zip(cleaned_df['lon'], cleaned_df['lat'])]
+    gdf_sp = GeoDataFrame(cleaned_df, geometry=geometry, crs={'init': 'epsg:4326'})
+
     aoigdf = GeoDataFrame(pd.DataFrame([{'label': 'aoi'}]),
                           geometry=[aoi], crs={'init': 'epsg:4326'})
 
-    filtgdf = gpd.sjoin(online_sp, aoigdf)
+    filtgdf = gpd.sjoin(gdf_sp, aoigdf)
 
     return ObservationList(
         obs_type=obs_type,

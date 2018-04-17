@@ -5,3 +5,5 @@ geopandas
 requests
 pandas
 lxml
+django-redis
+hiredis

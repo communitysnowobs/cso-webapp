@@ -135,3 +135,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# CACHE CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
+CACHES = {
+    'default': {
+        # The Redis database at index 0 is used by Logstash/Beaver
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://{0}:{1}/1'.format('localhost', 6379),
+        'OPTIONS': {
+            'PARSER_CLASS': 'redis.connection.HiredisParser',
+            'SOCKET_TIMEOUT': 3,
+        }
+    }
+}
+
+# Don't throw exceptions if Redis is down.
+DJANGO_REDIS_IGNORE_EXCEPTIONS = True
+# END CACHE CONFIGURATION
