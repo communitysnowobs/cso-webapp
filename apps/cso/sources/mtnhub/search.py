@@ -77,12 +77,10 @@ def search(**kwargs):
     bbox = kwargs.get('bbox')
     limit = kwargs.get('limit')
 
-    print(vars(bbox))
-
     params = {
         'publisher': 'all',
         'obs_type': 'snow_conditions',
-        'limit': 1000
+        'limit': 9999
     }
 
     if limit:
@@ -95,12 +93,12 @@ def search(**kwargs):
 
     if start_date:
         params.update({
-            'since': start_date
+            'since': int(pd.to_datetime(start_date).strftime('%s'))*1000
         })
 
     if end_date:
         params.update({
-            'before': end_date
+            'before': int(pd.to_datetime(end_date).strftime('%s'))*1000
         })
 
     response = requests.get(BASE_URL, params=params, headers=HEADER)
@@ -113,10 +111,11 @@ def search(**kwargs):
     count = len(data['results'])
 
     obsdf = parse_records(results)
-
-    return ObservationList(
-        obs_type=obs_type,
-        date_start=parse_date(data['pagination']['before']),
-        date_end=parse_date(data['pagination']['after']),
-        results=[parse_record(item) for i, item in obsdf.iterrows()],
-        count=count)
+    results = [parse_record(item) for i, item in obsdf.iterrows()]
+    return results, parse_date(data['pagination']['before']), parse_date(data['pagination']['after'])
+    # return ObservationList(
+    #     obs_type=obs_type,
+    #     date_start=parse_date(data['pagination']['before']),
+    #     date_end=parse_date(data['pagination']['after']),
+    #     results=[parse_record(item) for i, item in obsdf.iterrows()],
+    #     count=count)

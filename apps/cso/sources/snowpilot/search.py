@@ -136,17 +136,27 @@ def search(**kwargs):
         cleaned_df = _get_online_sp()
         cache.set(key, cleaned_df.to_dict(orient='records'), timeout=expiry)
 
-    geometry = [Point(xy) for xy in zip(cleaned_df['lon'], cleaned_df['lat'])]
-    gdf_sp = GeoDataFrame(cleaned_df, geometry=geometry, crs={'init': 'epsg:4326'})
+    filtgdf = cleaned_df
 
-    aoigdf = GeoDataFrame(pd.DataFrame([{'label': 'aoi'}]),
-                          geometry=[aoi], crs={'init': 'epsg:4326'})
+    if aoi:
+        geometry = [Point(xy) for xy in zip(cleaned_df['lon'], cleaned_df['lat'])]
+        gdf_sp = GeoDataFrame(cleaned_df, geometry=geometry, crs={'init': 'epsg:4326'})
 
-    filtgdf = gpd.sjoin(gdf_sp, aoigdf)
+        aoigdf = GeoDataFrame(pd.DataFrame([{'label': 'aoi'}]),
+                              geometry=[aoi], crs={'init': 'epsg:4326'})
 
-    return ObservationList(
-        obs_type=obs_type,
-        date_start=filtgdf['time'].min(),
-        date_end=filtgdf['time'].max(),
-        results=[parse_record(item) for i, item in filtgdf.iterrows()],
-        count=len(filtgdf.index))
+        filtgdf = gpd.sjoin(gdf_sp, aoigdf)
+
+    if start_date:
+        filtgdf = filtgdf[filtgdf['time'] >= pd.to_datetime(start_date)]
+    if end_date:
+        filtgdf = filtgdf[filtgdf['time'] <= pd.to_datetime(end_date)]
+    results = [parse_record(item) for i, item in filtgdf.iterrows()]
+
+    return results, filtgdf['time'].min(), filtgdf['time'].max()
+    # return ObservationList(
+    #     obs_type=obs_type,
+    #     date_start=filtgdf['time'].min(),
+    #     date_end=filtgdf['time'].max(),
+    #     results=[parse_record(item) for i, item in filtgdf.iterrows()],
+    #     count=len(filtgdf.index))

@@ -19,7 +19,7 @@ from shapely.geometry import Point, shape
 from apps.cso.serializers import ObservationListSerializer
 # from apps.cso.types import GET_FUNCTIONS
 from apps.cso.sources import SOURCES
-from apps.cso.models import BBOX
+from apps.cso.models import BBOX, ObservationList
 
 
 def parse_date(value):
@@ -30,19 +30,21 @@ def parse_date(value):
 
 def _do_get_observations(request):
     params = json.loads(request.body.decode("utf-8"))
-    source = params.get('source')
+    source = params.get('source').split(',')
     geom = params.get('geom')
 
     if not source:
         raise ValidationError({
             'error': 'Required argument: source'})
 
-    if not geom:
-        raise ValidationError({
-            'error': 'Required argument: geom'})
+    # if not geom:
+    #     raise ValidationError({
+    #         'error': 'Required argument: geom'})
     # Use a proper GEOS shape and calculate the bbox
-    aoi = shape(geom)
-    bbox = BBOX(*aoi.bounds)
+    aoi, bbox = None, None
+    if geom:
+        aoi = shape(geom)
+        bbox = BBOX(*aoi.bounds)
 
     get_kwargs = {
         'obs_type': params.get('type'),
@@ -54,14 +56,24 @@ def _do_get_observations(request):
         'limit': params.get('limit')
     }
 
-    getobs = SOURCES.get(source).get('search')
+    try:
+        alldt = []
+        allresults = []
+        for s in source:
+            getobs = SOURCES.get(s).get('search')
+            results, stdt, enddt = getobs(**get_kwargs)
+            alldt += [stdt, enddt]
+            allresults += results
 
-    if getobs:
-        try:
-            return getobs(**get_kwargs)
-        except ValueError as ex:
-            raise ParseError(ex)
-
+        print(allresults)
+        return ObservationList(
+            obs_type='snow_depth',
+            date_start=min(alldt),
+            date_end=max(alldt),
+            results=allresults,
+            count=len(allresults))
+    except Exception as e:
+        print(e)
 
 @decorators.api_view(['POST'])
 @decorators.permission_classes((AllowAny,))
