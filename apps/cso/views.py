@@ -9,6 +9,9 @@ import io
 
 from django.contrib.gis.geos import GEOSGeometry
 
+import pandas as pd
+import geopandas as gpd
+
 from rest_framework import decorators
 from rest_framework.exceptions import ValidationError, ParseError
 from rest_framework.permissions import AllowAny
@@ -17,7 +20,6 @@ from rest_framework.response import Response
 from shapely.geometry import Point, shape
 
 from apps.cso.serializers import ObservationListSerializer
-# from apps.cso.types import GET_FUNCTIONS
 from apps.cso.sources import SOURCES
 from apps.cso.models import BBOX, ObservationList
 
@@ -32,6 +34,7 @@ def _do_get_observations(request):
     params = json.loads(request.body.decode("utf-8"))
     source = params.get('source').split(',')
     geom = params.get('geom')
+    export = params.get('export')
 
     if not source:
         raise ValidationError({
@@ -65,7 +68,14 @@ def _do_get_observations(request):
             alldt += [stdt, enddt]
             allresults += results
 
-        print(allresults)
+        if export == 'GeoJSON':
+            resdct = list(map(lambda x: x.__dict__, allresults))
+            df = pd.DataFrame.from_records(resdct)
+            df.loc[:, 'reported_at'] = df.apply(lambda x: '{:%Y-%m-%d %H:%M:%S}'.format(x['reported_at']), axis=1)
+            geometry = df.apply(lambda x: Point((x['coords'][1], x['coords'][0])), axis=1)
+            gdf = gpd.GeoDataFrame(df, geometry=geometry, crs={'init': 'epsg:4326'})
+
+            return gdf
         return ObservationList(
             obs_type='snow_depth',
             date_start=min(alldt),
@@ -78,5 +88,8 @@ def _do_get_observations(request):
 @decorators.api_view(['POST'])
 @decorators.permission_classes((AllowAny,))
 def getobs(request):
-    result = ObservationListSerializer(_do_get_observations(request))
+    obs = _do_get_observations(request)
+    if type(obs) == gpd.GeoDataFrame:
+        return  Response(json.loads(obs.to_json()))
+    result = ObservationListSerializer(obs)
     return Response(result.data)

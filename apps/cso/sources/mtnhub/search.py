@@ -7,8 +7,9 @@ import datetime
 import pandas as pd
 import requests
 
+from django.core.cache import cache
+
 from apps.cso.sources.mtnhub.models import MtnHubObs
-from apps.cso.models import BBOX, ObservationList
 
 SOURCE_NAME = 'mtnhub'
 
@@ -76,6 +77,7 @@ def search(**kwargs):
     end_date = kwargs.get('end_date')
     bbox = kwargs.get('bbox')
     limit = kwargs.get('limit')
+    key = 'cso_{}_{}'.format(SOURCE_NAME, obs_type)
 
     params = {
         'publisher': 'all',
@@ -101,18 +103,25 @@ def search(**kwargs):
             'before': int(pd.to_datetime(end_date).strftime('%s'))*1000
         })
 
-    response = requests.get(BASE_URL, params=params, headers=HEADER)
-    data = response.json()
+    expiry = 300  # cache for 5 minutes
+    data = cache.get(key)
+    if data:
+        obsdf = pd.DataFrame.from_records(data)
+    else:
+        response = requests.get(BASE_URL, params=params, headers=HEADER)
+        data = response.json()
 
-    if 'results' not in data:
-        raise ValueError(data)
+        if 'results' not in data:
+            raise ValueError(data)
 
-    results = data['results']
-    count = len(data['results'])
+        results = data['results']
 
-    obsdf = parse_records(results)
+        # TODO: Make this more efficient, right now getting everything seems inefficient
+        obsdf = parse_records(results)
+        cache.set(key, obsdf.to_dict(orient='records'), timeout=expiry)
+
     results = [parse_record(item) for i, item in obsdf.iterrows()]
-    return results, parse_date(data['pagination']['before']), parse_date(data['pagination']['after'])
+    return results, parse_date(obsdf['timestamp'].min()), parse_date(obsdf['timestamp'].max())
     # return ObservationList(
     #     obs_type=obs_type,
     #     date_start=parse_date(data['pagination']['before']),
