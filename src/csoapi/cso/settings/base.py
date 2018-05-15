@@ -153,3 +153,10 @@ CACHES = {
 # Don't throw exceptions if Redis is down.
 DJANGO_REDIS_IGNORE_EXCEPTIONS = True
 # END CACHE CONFIGURATION
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+            'BUNDLE_DIR_NAME': 'bundles/',
+            'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.dev.json'),
+        }
+}
