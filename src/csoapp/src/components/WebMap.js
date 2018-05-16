@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import mapboxgl from 'mapbox-gl';
 import axios from 'axios';
 import GeoJSON from 'geojson';
+import moment from 'moment';
+
+import NoticeBox from './NoticeBox';
+import FilterBox from './FilterBox';
 
 
 mapboxgl.accessToken = 'pk.eyJ1IjoibHNldGlhd2FuIiwiYSI6ImNpbjI3M2UzNzBiZzh2OWtrZGlzZ2FhaG8ifQ.tkoR6uJikfFpOq4jfsk02w';
@@ -12,6 +16,11 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibHNldGlhd2FuIiwiYSI6ImNpbjI3M2UzNzBiZzh2OWtrZ
 class WebMap extends Component {
     constructor(props) {
         super(props);
+        let time = moment();
+        const end = time.format('YYYY-MM-DD');
+        time.subtract(30, 'days');
+        const start = time.format('YYYY-MM-DD');
+
         this.state = {
             lng: -145.729690,
             lat: 61.128601,
@@ -20,8 +29,8 @@ class WebMap extends Component {
             webmap: null,
             geojson: null,
             source: "mtnhub",
-            start_date: "2017-10-01",
-            end_date: "2018-04-30"
+            start_date: start,
+            end_date: end
         };
     }
 
@@ -124,7 +133,7 @@ class WebMap extends Component {
         }));
 
         map.on('load', () => {
-            this.getObservations();
+            // this.getObservations();
             this.getGeoJSON();
         }).on('click', 'snow_obs', (e) => {
             let coordinates = e.features[0].geometry.coordinates.slice();
@@ -258,7 +267,8 @@ class WebMap extends Component {
         return (
             <div style={{width: '100%', height: '100%'}}>
                 <div ref={el => this.mapContainer = el} style={style}/>
-                {this.props.children}
+                <NoticeBox/>
+                <FilterBox start_date={this.state.start_date} end_date={this.state.end_date}/>
             </div>
         );
     }

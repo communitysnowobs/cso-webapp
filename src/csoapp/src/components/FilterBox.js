@@ -4,8 +4,8 @@ class FilterBox extends Component {
     constructor(props){
         super(props);
         this.state = {
-            startdate: "2017-10-01",
-            enddate: "2018-04-30"
+            startdate: props.start_date,
+            enddate: props.end_date
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -35,7 +35,7 @@ class FilterBox extends Component {
 
     render() {
         const FilterBox = {
-            height: '135px',
+            height: '200px',
             width: '250px',
             position: 'absolute',
             top: '225px',
@@ -47,12 +47,13 @@ class FilterBox extends Component {
 
         return (
             <div style={FilterBox}>
+                <p>Snow observations date range</p>
                 <form>
                     <label>
-                        Start Date: <input id="startdate" type="date" defaultValue={this.state.startdate} onChange={this.updateStart.bind(this)}/>
+                        Start Date: <input id="startdate" type="date" defaultValue={this.state.startdate} onChange={this.updateStart.bind(this)} readOnly/>
                     </label>
                     <label>
-                        End Date: <input id="enddate" type="date" defaultValue={this.state.enddate} onChange={this.updateEnd.bind(this)}/>
+                        End Date: <input id="enddate" type="date" defaultValue={this.state.enddate} onChange={this.updateEnd.bind(this)} readOnly/>
                     </label>
                 </form>
             </div>
