@@ -103,3 +103,14 @@ ENV/
 # pycharm
 .idea/
 .ipynb
+
+# dask
+dask-worker-space
+
+# testing
+test.json
+
+# frontend
+node_modules
+webpack-stats.dev.json
+package-lock.json
