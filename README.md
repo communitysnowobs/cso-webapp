@@ -9,7 +9,7 @@ The main website can be found [here](http://communitysnowobs.org).
 1. Install backend conda environment
    ```
    cd src/csoapi
-   conda install -c conda-forge -n cso --file requirements.txt --file requirements-dev.txt
+   conda create -c conda-forge -n cso --file requirements.txt --file requirements-dev.txt
    ```
 2. Run backend server
    ```
