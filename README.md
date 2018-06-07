@@ -48,4 +48,4 @@ MAPBOX_TOKEN={INSERT_MAPBOX_TOKEN_HERE}
 ```
 yarn run dev
 ```
-5. Go to <localhost:3000>
+5. Go to [localhost:3000]
