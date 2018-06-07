@@ -7,4 +7,3 @@ pandas
 lxml
 django-redis
 hiredis
-django-webpack-loader

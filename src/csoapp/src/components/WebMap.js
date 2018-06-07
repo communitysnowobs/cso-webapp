@@ -7,11 +7,7 @@ import moment from 'moment';
 import NoticeBox from './NoticeBox';
 import FilterBox from './FilterBox';
 
-
 mapboxgl.accessToken = 'pk.eyJ1IjoibHNldGlhd2FuIiwiYSI6ImNpbjI3M2UzNzBiZzh2OWtrZGlzZ2FhaG8ifQ.tkoR6uJikfFpOq4jfsk02w';
-
-
-
 
 class WebMap extends Component {
     constructor(props) {

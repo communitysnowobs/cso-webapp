@@ -12,7 +12,20 @@ DEBUG = True
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'SOMESCRETKEYHERE'
 
-ALLOWED_HOSTS = ['127.0.0.1']
+INSTALLED_APPS = (
+    'corsheaders',
+    'django.contrib.contenttypes',
+    'django.contrib.auth'
+)
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware'
+]
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+CORS_ORIGIN_ALLOW_ALL = True
+
 
 # DATABASES = {
 #     'default': {

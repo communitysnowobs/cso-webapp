@@ -114,3 +114,7 @@ test.json
 node_modules
 webpack-stats.dev.json
 package-lock.json
+
+# ENV Variables
+.env
+.next
