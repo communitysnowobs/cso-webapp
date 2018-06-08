@@ -11,11 +11,15 @@ const Map = dynamic(import('../components/Map.js'), {
   ssr: false
 })
 
+const Deck = dynamic(import('../components/Deck.js'), {
+  ssr: false
+})
+
 export default () => (
   <div className = "root">
     <Meta />
     <Nav />
-    <Map/>
+    <Deck/>
     <style jsx>{style}</style>
   </div>
 )

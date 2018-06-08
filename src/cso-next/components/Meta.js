@@ -18,6 +18,7 @@ export default () => (
                roboto, noto,
                'segoe ui', arial,
                sans-serif;
+         box-sizing: border-box;
       }
       .mapboxgl-ctrl-scale {
         display: none;

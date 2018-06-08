@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import css from 'styled-jsx/css'
 import mapboxgl from 'mapbox-gl';
+import ReactMapGL from 'react-map-gl'
 import axios from 'axios';
 import GeoJSON from 'geojson';
 import moment from 'moment';
 
 import { drawStyle, clusterStyle, clusterCountStyle, snowObsStyle } from '../styles/map.js'
 
-mapboxgl.accessToken = process.env.MAPBOX_TOKEN;
+mapboxgl.accessToken = process.env.MapboxAccessToken;
 
 class Map extends Component {
 
@@ -27,7 +28,14 @@ class Map extends Component {
             geojson: null,
             source: "mtnhub",
             start_date: start,
-            end_date: end
+            end_date: end,
+            viewport: {
+              width: 1000,
+              height: 800,
+              latitude: 61.128601,
+              longitude: -145.729690,
+              zoom: 6
+            }
         };
     }
 
@@ -245,9 +253,9 @@ class Map extends Component {
 
     componentDidMount() {
 
-        const map = this.createMap()
-        this.registerEvents(map)
-        this.setState({webmap: map});
+        //const map = this.createMap()
+        //this.registerEvents(map)
+        //this.setState({webmap: map});
     }
 
     render() {
@@ -258,7 +266,7 @@ class Map extends Component {
 
         return (
             <div className = 'root'>
-                <div className = 'map' ref={el => this.mapContainer = el} />
+                <ReactMapGL {...this.state.viewport} onViewportChange={(viewport) => this.setState({viewport})} />
                 <div id="attribution" className="mapboxgl-map mapboxgl-ctrl mapboxgl-ctrl-attrib mapboxgl-compact">
                   <span>
                     {"Snow Observation Data © "}
