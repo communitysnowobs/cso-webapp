@@ -45,73 +45,10 @@ class Map extends Component {
 
     }
 
-    getGeoJSON(geom) {
-        const baseurl = '';
-
-        let payload = {
-            url: 'http://127.0.0.1:8000/cso/observations',
-            data: {
-                source: this.state.source,
-                start_date: this.state.start_date,
-                end_date: this.state.end_date,
-                export: "GeoJSON"
-            }
-        };
-
-        if (geom !== null) {
-            payload.data = {...payload.data, geom: geom}
-        }
-
-        const cso = axios.create({
-            baseURL: baseurl,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        cso.post(payload.url, payload.data)
-            .then((response) => {
-                this.setState({
-                    geojson: response.data
-                })
-            })
-            .catch((err) => {
-              console.log("Problem here")
-              console.log(err)
-            })
-    }
-
-    getObservations(geom) {
-        const baseurl = '';
-
-        let payload = {
-            url: '/cso/observations',
-            data: {
-                source: "mtnhub",
-                start_date: "2017-10-01",
-                end_date: "2018-04-30"
-            }
-        };
-
-        if (geom !== null) {
-            payload.data = {...payload.data, geom: geom}
-        }
-
-        const cso = axios.create({
-            baseURL: baseurl,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        cso.post(payload.url, payload.data)
-            .then((response) => {
-                this.setState({
-                    data: response.data.results
-                })
-            })
-            .catch((err) => console.log(err))
-
+    async getGeoJSON(geom) {
+      const res = await axios.get('https://api.communitysnowobs.org/obs?format=geojson&limit=10000')
+      this.setState({geojson: res.data})
+      console.log("Res", res.data)
     }
 
     createMap() {
@@ -119,7 +56,7 @@ class Map extends Component {
       const { lng, lat, zoom } = this.state;
       const map = new mapboxgl.Map({
           container: this.mapContainer,
-          style: 'mapbox://styles/mapbox/light-v9',
+          style: 'mapbox://styles/mapbox/dark-v9',
           center: [lng, lat],
           attributionControl: false,
           zoom
@@ -131,17 +68,6 @@ class Map extends Component {
       const scale = new mapboxgl.ScaleControl({ maxWidth: 80, unit: 'imperial' })
       map.addControl(scale, 'top-left');
 
-      const draw = new MapboxDraw({
-          displayControlsDefault: false,
-          controls: {
-              polygon: true,
-              trash: true
-          },
-          ...drawStyle
-      })
-      map.addControl(draw, 'bottom-left')
-
-      map.scrollZoom.disable()
       map.dragRotate.disable();
       map.touchZoomRotate.disableRotation();
 
@@ -184,41 +110,43 @@ class Map extends Component {
       map.on('load', () => { this.getGeoJSON() })
 
       map.on('click', 'snow_obs', (e) => {
-          let coordinates = e.features[0].geometry.coordinates.slice();
-          let properties = e.features[0].properties;
+          console.log("CLICK")
+          console.log(e.features[0])
 
-          let obs_coords = JSON.parse(properties.coords);
-          let template = `<h2>${properties.name}</h2>
+          let coordinates = e.features[0].geometry.coordinates
+          let properties = e.features[0].properties
+
+          let template = `<h2>${properties.author}</h2>
                           <table class="table table-bordered table-hover">
                           <tbody>
                               <tr>
                                   <td class="title">Coordinates</td>
-                                  <td>${Number.parseFloat(obs_coords[0]).toPrecision(4)}, ${Number.parseFloat(obs_coords[1]).toPrecision(4)}</td>
+                                  <td>${coordinates[0].toPrecision(4)}, ${coordinates[1].toPrecision(4)}</td>
                               </tr>
                               <tr>
                                   <td class="title">Time Collected</td>
-                                  <td>${properties.reported_at}</td>
+                                  <td>${Date(properties.timestamp).toString().slice(0,15)}</td>
                               </tr>
                               <tr>
-                                  <td class="title">Avg. Snow Depth Measured</td>
-                                  <td>${Number.parseFloat(properties.snow_depth).toPrecision(3)} cm</td>
+                                  <td class="title">Snow Depth Measured</td>
+                                  <td>${Number.parseFloat(properties.depth).toPrecision(3)} cm</td>
                               </tr>
                           </tbody>
                           </table>`;
-
-          // Ensure that if the map is zoomed out such that multiple
-          // copies of the feature are visible, the popup appears
-          // over the copy being pointed to.
+          //
+          // // Ensure that if the map is zoomed out such that multiple
+          // // copies of the feature are visible, the popup appears
+          // // over the copy being pointed to.
           while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
               coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
           }
-
+          //
           new mapboxgl.Popup()
               .setLngLat(coordinates)
               .setHTML(template)
               .addTo(map);
 
-          map.flyTo({center: e.features[0].geometry.coordinates})
+          // map.flyTo({center: e.features[0].geometry.coordinates})
       })
 
       map.on('mouseenter', 'snow_obs', () => {
