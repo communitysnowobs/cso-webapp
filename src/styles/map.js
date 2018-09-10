@@ -108,11 +108,6 @@ export const drawStyle = {
 
 export const clusterStyle = {
   paint: {
-      // Use step expressions (https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
-      // with three steps to implement three types of circles:
-      //   * Blue, 20px circles when point count is less than 100
-      //   * Yellow, 30px circles when point count is between 100 and 750
-      //   * Pink, 40px circles when point count is greater than or equal to 750
       "circle-color": [
           "step",
           ["get", "point_count"],
