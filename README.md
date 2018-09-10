@@ -1,37 +1,16 @@
-# nasacso-webapp
+# Community Snow Observations Web App
 
 This is a Web Application for NASA Community Science Observations.
 
 The main website can be found [here](http://communitysnowobs.org).
 
 ## Running development
-
-1. Install backend conda environment
-   ```
-   cd src/csoapi
-   conda create -c conda-forge -n cso --file requirements.txt --file requirements-dev.txt
-   ```
-2. Run backend server
-   ```
-   python manage.py runserver
-   ```
-3. Install frontend environment
-   ```
-   cd src/csoapp
-   npm install
-   ```
-4. Run frontend server
-   ```
-   npm start
-   ```
-6. Go to http://127.0.0.1:8000/
-
-### CSO Next
+*The following steps can be followed using either yarn or npm*
 
 1. Install necessary packages
 
 ```
-cd src/cso-next
+cd src
 yarn install
 ```
 
@@ -49,3 +28,18 @@ MAPBOX_TOKEN={INSERT_MAPBOX_TOKEN_HERE}
 yarn run dev
 ```
 5. Go to <localhost:3000>
+
+## Packaging as static site
+
+1. Build production version of site
+```
+yarn run build
+```
+
+2. Export site
+```
+yarn run export
+```
+3. Push site to S3 bucket (Requires AWS sign in).
+Modify the `build` script in `package.json` to use your bucket of choice, then run
+```yarn run push```
