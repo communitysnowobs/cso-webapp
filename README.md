@@ -4,7 +4,7 @@ This is a Web Application for NASA Community Science Observations.
 
 The main website can be found [here](http://communitysnowobs.org).
 
-## Running development
+## Running in development
 *The following steps can be followed using either yarn or npm*
 
 1. Install necessary packages
