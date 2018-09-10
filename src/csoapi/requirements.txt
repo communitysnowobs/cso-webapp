@@ -1,9 +1,0 @@
-django
-djangorestframework
-psycopg2
-geopandas
-requests
-pandas
-lxml
-django-redis
-hiredis

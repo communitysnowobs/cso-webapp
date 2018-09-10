@@ -118,3 +118,9 @@ package-lock.json
 # ENV Variables
 .env
 .next
+
+#
+out/
+static/
+
+.DS_Store
