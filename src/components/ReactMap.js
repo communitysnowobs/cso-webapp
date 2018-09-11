@@ -1,5 +1,6 @@
 import {Component} from 'react';
 import ReactMapGL from 'react-map-gl';
+import Attribution from './Attribution.js'
 import Popup from './Popup.js'
 import RadioGroup from './RadioGroup.js'
 import RadioItem from './RadioItem.js'
@@ -149,6 +150,7 @@ class ReactMap extends Component {
           {...this.state.viewport}
           className = {'map'}
           mapStyle={'mapbox://styles/mapbox/dark-v9'}
+          attributionControl={false}
           onViewportChange={(viewport) => this.setState({viewport})}
           onClick={this.onClick}
         >
@@ -160,6 +162,7 @@ class ReactMap extends Component {
           <RadioItem title={"Clustered"} />
           <RadioItem title={"Unclustered"} />
         </RadioGroup>
+        <Attribution/>
         <style jsx>{style}</style>
       </div>
     );
