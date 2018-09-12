@@ -124,3 +124,4 @@ out/
 *.geojson
 
 .DS_Store
+*.sketch
