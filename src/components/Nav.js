@@ -9,7 +9,7 @@ export default () => (
 
 const style = css`
   .root {
-    background-color: rgba(12, 12, 12, 0.8);
+    background-color: rgba(12, 12, 12, 0.75);
     color: #fff;
     width: 100%;
     font-weight: 500;

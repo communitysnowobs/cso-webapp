@@ -1,5 +1,5 @@
 import {Component} from 'react';
-import ReactMapGL from 'react-map-gl';
+import ReactMapGL, {NavigationControl} from 'react-map-gl';
 import Attribution from './Attribution.js'
 import Popup from './Popup.js'
 import RadioGroup from './RadioGroup.js'
@@ -149,7 +149,7 @@ class ReactMap extends Component {
           ref={this.map}
           {...this.state.viewport}
           className = {'map'}
-          mapStyle={'mapbox://styles/mapbox/dark-v9'}
+          mapStyle={process.env.MAPBOX_STYLE}
           attributionControl={false}
           onViewportChange={(viewport) => this.setState({viewport})}
           onClick={this.onClick}
@@ -157,6 +157,9 @@ class ReactMap extends Component {
           {this.state.selected &&
             <Popup geometry={this.state.selected.geometry} properties={this.state.selected.properties}/>
           }
+          <div style={{position: 'absolute', right: 12, top: 60}}>
+            <NavigationControl onViewportChange={(viewport) => this.setState({viewport})} />
+          </div>
         </ReactMapGL>
         <RadioGroup initiallySelected = "Clustered" onItemChanged = {this.toggleClustered}>
           <RadioItem title={"Clustered"} />
