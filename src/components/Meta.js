@@ -7,6 +7,14 @@ export default () => (
       <meta charSet="utf-8" />
       <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.46.0/mapbox-gl.css' rel='stylesheet' />
       <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.4/mapbox-gl-draw.js'></script>
+      <link rel="apple-touch-icon" sizes="180x180" href="/static/icon/apple-touch-icon.png"/>
+      <link rel="icon" type="image/png" sizes="32x32" href="/static/icon/favicon-32x32.png"/>
+      <link rel="icon" type="image/png" sizes="16x16" href="/static/icon/favicon-16x16.png"/>
+      <link rel="manifest" href="/static/icon/site.webmanifest"/>
+      <link rel="mask-icon" href="/static/icon/safari-pinned-tab.svg" color="#0088ff"/>
+      <meta name="msapplication-TileColor" content="#0088ff"/>
+      <meta name="msapplication-TileImage" content="/static/icon/mstile-144x144.png"/>
+      <meta name="theme-color" content="#222222"/>
     </Head>
     <style jsx global>{`
       * {
