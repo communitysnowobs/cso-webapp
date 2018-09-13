@@ -15,7 +15,7 @@ const style = css`
     padding: 0.5rem 1rem;
     width: 90px;
     cursor: pointer;
-    font-weight: 400;
+    font-weight: 500;
   }
   .selected {
     background-color: #08f;
