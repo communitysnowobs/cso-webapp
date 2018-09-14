@@ -16,7 +16,7 @@ const style = css`
     cursor: pointer;
     height: 100%;
   }
-  @media (max-width: 480px) {
+  @media (max-width: 600px) {
       .title {
         display: none;
       }
