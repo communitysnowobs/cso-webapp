@@ -162,8 +162,8 @@ class ReactMap extends Component {
           </div>
         </ReactMapGL>
         <RadioGroup initiallySelected = "Clustered" onItemChanged = {this.toggleClustered}>
-          <RadioItem title={"Clustered"} />
-          <RadioItem title={"Unclustered"} />
+          <RadioItem title={"Clustered"} icon={"static/images/clustered.png"} />
+          <RadioItem title={"Unclustered"} icon={"static/images/unclustered.png"}/>
         </RadioGroup>
         <Attribution/>
         <style jsx>{style}</style>

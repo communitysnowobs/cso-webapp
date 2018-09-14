@@ -47,6 +47,7 @@ const style = css`
     overflow: hidden;
     border: 2px solid #08f;
     text-align: center;
+    height: 36px;
   }
 `
 
