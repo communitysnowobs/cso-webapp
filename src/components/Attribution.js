@@ -18,9 +18,6 @@ export default () => (
 
 const style = css`
   #attribution {
-    position: fixed;
-    bottom: 0;
-    right: 0;
     background-color: rgba(255, 255, 255, .5);
   }
   span {

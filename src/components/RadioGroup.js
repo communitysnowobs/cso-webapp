@@ -41,9 +41,6 @@ class RadioGroup extends Component {
 const style = css`
   .root {
     border-radius: 0.5rem;
-    position: fixed;
-    left: 0.75rem;
-    bottom: 0.75rem;
     overflow: hidden;
     border: 2px solid #08f;
     text-align: center;

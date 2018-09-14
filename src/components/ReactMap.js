@@ -160,12 +160,18 @@ class ReactMap extends Component {
           <div style={{position: 'absolute', right: 12, top: 60}}>
             <NavigationControl onViewportChange={(viewport) => this.setState({viewport})} />
           </div>
+          <div className = "clustering">
+            <RadioGroup initiallySelected = "Clustered" onItemChanged = {this.toggleClustered}>
+              <RadioItem title={"Clustered"} icon={"static/images/clustered.png"} />
+              <RadioItem title={"Unclustered"} icon={"static/images/unclustered.png"}/>
+            </RadioGroup>
+          </div>
+          <div className = "attribution">
+            <Attribution/>
+          </div>
         </ReactMapGL>
-        <RadioGroup initiallySelected = "Clustered" onItemChanged = {this.toggleClustered}>
-          <RadioItem title={"Clustered"} icon={"static/images/clustered.png"} />
-          <RadioItem title={"Unclustered"} icon={"static/images/unclustered.png"}/>
-        </RadioGroup>
-        <Attribution/>
+
+
         <style jsx>{style}</style>
       </div>
     );
@@ -186,8 +192,15 @@ const style = css`
     left: 0;
     right: 0;
   }
-  .loading-overlay {
-    background-color: #191a1a;
+  .clustering {
+    position: absolute;
+    left: 0.75rem;
+    bottom: 0.75rem;
+  }
+  .attribution {
+    position: absolute;
+    bottom: 0;
+    right: 0;
   }
 `
 
