@@ -48,7 +48,10 @@ export default () => (
       }
       .mapboxgl-popup {
         width: 240px !important;
-        padding: 10px 10px !important;
+        padding: 10px !important;
+      }
+      .mapboxgl-popup-content {
+        padding: 10px !important;
       }
 
       .mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
