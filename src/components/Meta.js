@@ -74,6 +74,9 @@ export default () => (
         background-color: #1e1e1e !important;
         border-radius: 8px !important;
       }
+      .mapboxgl-ctrl-attrib.mapboxgl-compact:hover {
+        z-index: 101;
+      }
       .mapboxgl-popup-anchor-top-left .mapboxgl-popup-content {
         border-top-left-radius: 0px !important;
       }
