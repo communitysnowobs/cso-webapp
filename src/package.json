@@ -16,6 +16,8 @@
     "axios": "^0.18.0",
     "deck.gl": "^5.3.4",
     "dotenv": "^6.0.0",
+    "downloadjs": "^1.4.7",
+    "emotion-server": "^9.2.12",
     "geojson": "^0.5.0",
     "mapbox-gl": "^0.45.0",
     "moment": "^2.22.2",
@@ -23,7 +25,9 @@
     "node-window-polyfill": "^1.0.0",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
+    "react-emotion": "^9.2.12",
     "react-map-gl": "^3.3.4",
-    "react-no-ssr": "^1.1.0"
+    "react-no-ssr": "^1.1.0",
+    "react-select": "^2.1.1"
   }
 }
