@@ -120,21 +120,6 @@ const style = css`
   width: 400px;
   padding: 1rem;
   max-width: 100%;
-
-}
-.map-container {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -100;
-}
-.map {
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
 }
 .left, .right {
   width: 50%;
