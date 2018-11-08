@@ -9,7 +9,7 @@ import ReactMap from '../components/ReactMap.js'
 export default () => (
   <div className = "root">
     <Meta />
-    <Nav />
+    <Nav downloadButton/>
     <div className = "map-container">
       <NoSSR>
         <ReactMap className = "map"/>
