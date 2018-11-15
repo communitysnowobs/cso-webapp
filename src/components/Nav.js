@@ -2,7 +2,7 @@ import css from 'styled-jsx/css'
 
 export default ({downloadButton}) => (
   <div className = 'root'>
-    <div className = 'title'>CSO <span>Data</span></div>
+    <a href = "/" className = 'title'>CSO <span>Data</span></a>
     {downloadButton && <a href = "/download" className = 'download'>Download Data</a>}
     <style jsx>{style}</style>
   </div>
@@ -41,6 +41,8 @@ const style = css`
     margin-left: 1rem;
     display: inline-block;
     align-self: center;
+    text-decoration: none;
+    color: #fff;
   }
   span {
     color: #08f;

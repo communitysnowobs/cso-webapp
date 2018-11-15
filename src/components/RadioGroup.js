@@ -45,6 +45,7 @@ const style = css`
     border: 2px solid #08f;
     text-align: center;
     height: 36px;
+    box-sizing: content-box;
   }
 `
 
