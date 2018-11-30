@@ -9,6 +9,8 @@ import axios from 'axios'
 const providerOptions = [
   { value: 'MountainHub', label: 'MountainHub' },
   { value: 'SnowPilot', label: 'SnowPilot' },
+  { value: 'regObs', label: "RegObs"},
+  { value: 'MountainHub,SnowPilot,regObs', label:  "All"}
 ]
 
 const formatOptions = [

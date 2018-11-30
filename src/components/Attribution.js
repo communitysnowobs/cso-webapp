@@ -7,6 +7,8 @@ export default () => (
      <a href="https://about.mountainhub.com/about/" target="_blank">MountainHub</a>
      {" © "}
      <a href="https://snowpilot.org" target="_blank">SnowPilot</a>
+     {" © "}
+     <a href="https://www.regobs.no" target="_blank">regObs</a>
      {" | Map Data © "}
      <a href="https://www.mapbox.com/about/maps/" target="_blank">Mapbox</a> © <a href="http://www.openstreetmap.org/about/" target="_blank">OpenStreetMap</a>
      {" | "}
