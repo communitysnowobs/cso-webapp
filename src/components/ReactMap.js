@@ -13,7 +13,7 @@ class ReactMap extends Component {
 
   constructor(props) {
     super(props);
-    this.map = React.createRef();
+    this.mapRef = React.createRef();
     this.state = {
       viewport: {
         width: window.innerWidth,
@@ -32,18 +32,18 @@ class ReactMap extends Component {
     this.onClick = this.onClick.bind(this)
     this.onResize = this.onResize.bind(this)
     this.getData = this.getData.bind(this)
-    this.setLoaded = this.setLoaded.bind(this)
+    this.onLoad = this.onLoad.bind(this)
   }
 
   componentDidMount() {
-    this.map.current.getMap().on('style.load', this.setLoaded)
     window.addEventListener('resize', this.onResize)
     this.getData()
   }
 
   onClick(e) {
-    if (e.features[0].layer.id == "snow_obs" || e.features[0].layer.id == "snow_obs_unclustered") {
-      this.setState({selected: e.features[0]})
+    const filteredFeatures = e.features.filter(feature => feature.layer.id == "snow_obs" || feature.layer.id == "snow_obs_unclustered");
+    if (filteredFeatures.length > 0) {
+      this.setState({selected: filteredFeatures.slice(0,3)})
     }
     else {
       this.setState({selected: null})
@@ -63,7 +63,7 @@ class ReactMap extends Component {
   componentDidUpdate(prevProps, prevState) {
     if ((!prevState.observations || !prevState.loaded)&& this.state.observations && this.state.loaded) {
       this.registerLayers()
-      this.setClustered()
+      this.onCluster()
     }
     if (!prevState.clustered != this.state.clustered) {
 
@@ -75,7 +75,7 @@ class ReactMap extends Component {
   }
 
   registerLayers() {
-    let map = this.map.current.getMap()
+    let map = this.mapRef.current.getMap()
     map.addSource("obs_clustered", {
         type: "geojson",
         data: this.state.observations,
@@ -116,20 +116,21 @@ class ReactMap extends Component {
       ...snowObsStyle
     })
   }
-  setLoaded() {
+  onLoad(e) {
+    console.log("Set loaded")
     this.setState({loaded:true})
   }
   setLayerVisibility(layer, visibility) {
-    let map = this.map.current.getMap()
+    let map = this.mapRef.current.getMap()
     map.setLayoutProperty(layer, 'visibility', visibility);
   }
-  setClustered() {
+  onCluster() {
     this.setLayerVisibility("snow_obs_unclustered", "none")
     this.setLayerVisibility("clusters", "visible")
     this.setLayerVisibility("cluster_count", "visible")
     this.setLayerVisibility("snow_obs", "visible")
   }
-  setUnclustered() {
+  onUncluster() {
     this.setLayerVisibility("snow_obs_unclustered", "visible")
     this.setLayerVisibility("clusters", "none")
     this.setLayerVisibility("cluster_count", "none")
@@ -137,8 +138,8 @@ class ReactMap extends Component {
   }
 
   toggleClustered(value) {
-    if (value == "Clustered") this.setClustered();
-    else if (value == "Unclustered") this.setUnclustered()
+    if (value == "Clustered") this.onCluster();
+    else if (value == "Unclustered") this.onUncluster()
   }
 
   render() {
@@ -146,16 +147,17 @@ class ReactMap extends Component {
       <div className = "root">
 
         <ReactMapGL
-          ref={this.map}
           {...this.state.viewport}
+          ref={this.mapRef}
           className = {'map'}
           mapStyle={process.env.MAPBOX_STYLE}
           attributionControl={false}
           onViewportChange={(viewport) => this.setState({viewport})}
           onClick={this.onClick}
+          onLoad={this.onLoad}
         >
           {this.state.selected &&
-            <Popup geometry={this.state.selected.geometry} properties={this.state.selected.properties}/>
+            <Popup selected={this.state.selected} properties={this.state.selected.properties}/>
           }
           <div style={{position: 'absolute', right: 12, top: 60}}>
             <NavigationControl onViewportChange={(viewport) => this.setState({viewport})} />

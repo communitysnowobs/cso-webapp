@@ -12,7 +12,7 @@ export default () => (
     <Nav downloadButton/>
     <div className = "map-container">
       <NoSSR>
-        <ReactMap className = "map"/>
+        <ReactMap/>
       </NoSSR>
     </div>
     <style jsx>{style}</style>
