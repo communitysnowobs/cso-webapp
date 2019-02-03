@@ -1,7 +1,7 @@
 import {Component} from 'react';
 import ReactMapGL, {NavigationControl} from 'react-map-gl';
 import Attribution from './Attribution.js'
-import Popup from './Popup.js'
+import ObservationPopup from './ObservationPopup.js'
 import RadioGroup from './RadioGroup.js'
 import RadioItem from './RadioItem.js'
 import axios from 'axios'
@@ -157,7 +157,7 @@ class ReactMap extends Component {
           onLoad={this.onLoad}
         >
           {this.state.selected &&
-            <Popup selected={this.state.selected} properties={this.state.selected.properties}/>
+            <ObservationPopup  selected={this.state.selected}/>
           }
           <div style={{position: 'absolute', right: 12, top: 60}}>
             <NavigationControl onViewportChange={(viewport) => this.setState({viewport})} />
