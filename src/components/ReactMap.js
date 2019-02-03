@@ -145,7 +145,6 @@ class ReactMap extends Component {
   render() {
     return (
       <div className = "root">
-
         <ReactMapGL
           {...this.state.viewport}
           ref={this.mapRef}
@@ -172,8 +171,6 @@ class ReactMap extends Component {
             </RadioGroup>
           </div>
         </ReactMapGL>
-
-
         <style jsx>{style}</style>
       </div>
     );
