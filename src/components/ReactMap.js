@@ -24,32 +24,45 @@ class ReactMap extends Component {
         mapboxApiAccessToken: process.env.MAPBOX_TOKEN,
       },
       observations: null,
-      loaded: false,
+      isMapLoaded: false,
       selected: null,
     };
 
     this.toggleClustered = this.toggleClustered.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onResize = this.onResize.bind(this)
-    this.getData = this.getData.bind(this)
-    this.onLoad = this.onLoad.bind(this)
+    this.loadObservations = this.loadObservations.bind(this)
+    this.onMapLoad = this.onMapLoad.bind(this)
   }
 
   componentDidMount() {
+    // Add listener for window resize events
     window.addEventListener('resize', this.onResize)
-    this.getData()
+    // Fetch observations
+    this.loadObservations()
   }
 
   onClick(e) {
-    const filteredFeatures = e.features.filter(feature => feature.layer.id == "snow_obs" || feature.layer.id == "snow_obs_unclustered");
-    if (filteredFeatures.length > 0) {
-      this.setState({selected: filteredFeatures.slice(0,3)})
+    const selected = e.features
+      .filter(f => f.layer.id == "snow_obs" || f.layer.id == "snow_obs_unclustered")
+      .map(f => ({
+        longitude: f.geometry.coordinates[0],
+        latitude: f.geometry.coordinates[1],
+        author: f.properties.author,
+        source: f.properties.source,
+        depth: f.properties.depth,
+        timestamp: f.properties.timestamp
+      }))
+      .sort((x,y) => new Date(x.timestamp).getTime() - new Date(y.timestamp).getTime());
+    if (selected.length > 0) {
+      this.setState({selected})
     }
     else {
       this.setState({selected: null})
     }
   }
 
+  // Resize map viewport on window resize event
   onResize() {
     this.setState({
        viewport: {
@@ -60,21 +73,20 @@ class ReactMap extends Component {
      })
   }
 
+  // Add data once map and observations have been loaded
   componentDidUpdate(prevProps, prevState) {
-    if ((!prevState.observations || !prevState.loaded)&& this.state.observations && this.state.loaded) {
-      this.registerLayers()
-      this.onCluster()
-    }
-    if (!prevState.clustered != this.state.clustered) {
-
+    if ((!prevState.observations || !prevState.isMapLoaded) && (this.state.observations && this.state.isMapLoaded)) {
+      this.addSources();
+      this.addLayers();
     }
   }
-  async getData() {
+
+  async loadObservations() {
     let res = await axios.get('/static/data.geojson')
     this.setState({observations: res.data})
   }
 
-  registerLayers() {
+  addSources() {
     let map = this.mapRef.current.getMap()
     map.addSource("obs_clustered", {
         type: "geojson",
@@ -87,6 +99,9 @@ class ReactMap extends Component {
         type: "geojson",
         data: this.state.observations,
     });
+  }
+  addLayers() {
+    let map = this.mapRef.current.getMap()
     map.addLayer({
         id: "clusters",
         type: "circle",
@@ -112,24 +127,29 @@ class ReactMap extends Component {
       id: "snow_obs_unclustered",
       type: "circle",
       source: "obs_unclustered",
-      visibility: "none",
+      layout: {
+        visibility: "none"
+      },
       ...snowObsStyle
     })
   }
-  onLoad(e) {
-    console.log("Set loaded")
-    this.setState({loaded:true})
+
+  onMapLoad(e) {
+    this.setState({isMapLoaded:true})
   }
+
   setLayerVisibility(layer, visibility) {
     let map = this.mapRef.current.getMap()
     map.setLayoutProperty(layer, 'visibility', visibility);
   }
+
   onCluster() {
     this.setLayerVisibility("snow_obs_unclustered", "none")
     this.setLayerVisibility("clusters", "visible")
     this.setLayerVisibility("cluster_count", "visible")
     this.setLayerVisibility("snow_obs", "visible")
   }
+
   onUncluster() {
     this.setLayerVisibility("snow_obs_unclustered", "visible")
     this.setLayerVisibility("clusters", "none")
@@ -153,10 +173,10 @@ class ReactMap extends Component {
           attributionControl={false}
           onViewportChange={(viewport) => this.setState({viewport})}
           onClick={this.onClick}
-          onLoad={this.onLoad}
+          onLoad={this.onMapLoad}
         >
           {this.state.selected &&
-            <ObservationPopup  selected={this.state.selected}/>
+            <ObservationPopup features={this.state.selected}/>
           }
           <div style={{position: 'absolute', right: 12, top: 60}}>
             <NavigationControl onViewportChange={(viewport) => this.setState({viewport})} />

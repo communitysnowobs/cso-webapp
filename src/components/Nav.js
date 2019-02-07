@@ -1,9 +1,9 @@
 import css from 'styled-jsx/css'
 
-export default ({downloadButton}) => (
+export default ({showDownloadButton}) => (
   <div className = 'root'>
     <a href = "/" className = 'title'>CSO <span>Data</span></a>
-    {downloadButton && <a href = "/download" className = 'download'>Download Data</a>}
+    {showDownloadButton && <a href = "/download" className = 'download'>Download Data</a>}
     <style jsx>{style}</style>
   </div>
 )

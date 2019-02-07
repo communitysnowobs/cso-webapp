@@ -24,7 +24,6 @@ const style = css`
     margin-bottom: 24px;
     margin-top: 40px;
     font-weight: 500;
-    // box-shadow: 0px 2px 0px 0px #005FB3;
     transition: 0.25s;
   }
   .root:hover {

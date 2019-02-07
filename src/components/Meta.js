@@ -1,4 +1,7 @@
+// Contains app metadata, global css, mapbox css overrides
+
 import Head from 'next/head'
+
 export default () => (
   <div>
     <Head>
@@ -51,7 +54,7 @@ export default () => (
         right: 2px;
       }
       .mapboxgl-popup {
-        width: 240px !important;
+        width: 250px !important;
         padding: 10px !important;
       }
       .mapboxgl-popup-content {

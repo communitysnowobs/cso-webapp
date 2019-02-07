@@ -6,10 +6,10 @@
   "author": "Jonah Joughin",
   "license": "MIT",
   "scripts": {
-    "dev": "next",
-    "build": "next build",
-    "start": "next start",
-    "export": "next export",
+    "dev": "next ./src",
+    "build": "next build ./src",
+    "start": "next start ./src",
+    "export": "next export ./src",
     "push": "aws s3 sync ./out s3://cso-app --acl public-read --exclude \"*.geojson\" --exclude \"*.html\" --cache-control max-age=2592000 && aws s3 sync ./out s3://cso-app --acl public-read --exclude \"*\" --include \"*.html\""
   },
   "dependencies": {

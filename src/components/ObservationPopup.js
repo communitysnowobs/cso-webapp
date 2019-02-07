@@ -1,25 +1,57 @@
 import {Popup} from 'react-map-gl';
 import {LineChart, XAxis, YAxis, CartesianGrid, Line } from 'recharts'
 import css from 'styled-jsx/css'
+import moment from 'moment'
 
-export default ({selected}) => (<Popup className = "root" latitude={selected[0].geometry.coordinates[1]} longitude={selected[0].geometry.coordinates[0]} closeButton={false} closeOnClick={false}>
-    {
-      selected.map(entry => (
-        <div className="entry" key = {entry.properties.depth}>
-        <div className="depth">{Number.parseFloat(entry.properties.depth).toPrecision(3)} cm</div>
-        <div className="details">Reported by {entry.properties.author} at {entry.geometry.coordinates[0].toPrecision(4)}, {entry.geometry.coordinates[1].toPrecision(4)} on {new Date(entry.properties.timestamp).toString().slice(0,15)}</div>
-        <div className="source">Data from {entry.properties.source}</div>
+const formatXAxis= (tickItem) => moment(tickItem).format('MM-DD-YYYY');
+
+
+export default ({features}) => {
+  const meanLatitude = features.reduce((acc, f) => acc + f.latitude, 0)/features.length
+  const meanLongitude = features.reduce((acc, f) => acc + f.longitude, 0)/features.length
+  const meanDepth = features.reduce((acc, f) => acc + f.depth, 0)/features.length
+  const sources = Array.from(new Set(features.map(f => f.source)))
+  return (
+    <Popup
+      latitude={meanLatitude}
+      longitude={meanLongitude}
+      closeButton={false}
+      closeOnClick={false}
+    >
+    {features.length <= 3 ? (features.map(f => (
+        <div className="entry" key = {f.depth}>
+          <div className="depth">{Number.parseFloat(f.depth).toPrecision(3)} cm</div>
+          <div className="details">Reported by {f.author} at {f.longitude.toPrecision(4)}, {f.latitude.toPrecision(4)} on {new Date(f.timestamp).toString().slice(0,15)}</div>
+          <div className="source">Data from {f.source}</div>
         </div>
-      ))
+      ))) : (
+        <div>
+          <LineChart
+            width={200}
+            height={150}
+            margin={{ top: 10, right: 10, bottom: -10, left: -25 }}
+            data={features.map(f => ({value: f.depth, date: new Date(f.timestamp).getTime()}))}>
+            <XAxis
+              dataKey="date"
+              tick={{fontSize: 8, textAnchor: 'middle'}}
+              tickCount={3}
+              interval = {'preserveStartEnd'}
+              tickFormatter={formatXAxis}
+              type="number"
+              domain={['dataMin', 'dataMax']}/>
+            <YAxis tick={{fontSize: 8}}/>
+            <Line type="monotone" dataKey="value" stroke="#08f" dot={false} isAnimationActive = {false} />
+          </LineChart>
+          <div className="entry">
+            <div className="details">Mean depth of {meanDepth.toPrecision(3)} cm across {features.length} observations near {meanLongitude.toPrecision(4)}, {meanLatitude.toPrecision(4)}</div>
+            <div className="source">Data from {sources.join(", ")}</div>
+          </div>
+        </div>
+      )
     }
     <style jsx>{style}</style>
-  </Popup>)
-
-  //   <LineChart width={190} margin={{ top: 10, right: 10, bottom: -10, left: -30 }} height={100} data={[{name:'1', value: 1},{name:'3', value: 3},{name:'2', value: 2}]}>
-  //   <XAxis dataKey="name" tick={{fontSize: 8}}/>
-  //   <YAxis tick={{fontSize: 8}}/>
-  //   <Line type="monotone" dataKey="value" stroke="#08f" />
-  // </LineChart>
+  </Popup>
+)}
 
 const style = css`
   .root {
