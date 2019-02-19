@@ -49,7 +49,7 @@ class DownloadForm extends Component {
     }
 
 
-    let response = await axios.get('https://api.communitysnowobs.org/obs', { transformResponse: undefined, params: params})
+    let response = await axios.get('https://api.communitysnowobs.org/observations', { transformResponse: undefined, params: params})
     if (format == 'csv') {
       download(response.data, 'cso.csv', 'text/csv')
     }

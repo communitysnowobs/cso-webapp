@@ -10,7 +10,7 @@
     "build": "next build ./src",
     "start": "next start ./src",
     "export": "next export ./src",
-    "push": "aws s3 sync ./out s3://cso-app --acl public-read --exclude \"*.geojson\" --exclude \"*.html\" --cache-control max-age=2592000 && aws s3 sync ./out s3://cso-app --acl public-read --exclude \"*\" --include \"*.html\""
+    "push": "aws --profile cso s3 sync ./src/out s3://cso-app --acl public-read --exclude \"*.geojson\" --exclude \"*.html\" --cache-control max-age=2592000 && aws --profile cso s3 sync ./src/out s3://cso-app --acl public-read --exclude \"*\" --include \"*.html\""
   },
   "dependencies": {
     "axios": "^0.18.0",

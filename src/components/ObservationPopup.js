@@ -7,6 +7,7 @@ const formatXAxis= (tickItem) => moment(tickItem).format('MM-DD-YYYY');
 
 
 export default ({features}) => {
+  // Compute aggregate information
   const meanLatitude = features.reduce((acc, f) => acc + f.latitude, 0)/features.length
   const meanLongitude = features.reduce((acc, f) => acc + f.longitude, 0)/features.length
   const meanDepth = features.reduce((acc, f) => acc + f.depth, 0)/features.length
@@ -18,7 +19,8 @@ export default ({features}) => {
       closeButton={false}
       closeOnClick={false}
     >
-    {features.length <= 3 ? (features.map(f => (
+    {features.length <= 3 ?
+      (features.map(f => (
         <div className="entry" key = {f.depth}>
           <div className="depth">{Number.parseFloat(f.depth).toPrecision(3)} cm</div>
           <div className="details">Reported by {f.author} at {f.longitude.toPrecision(4)}, {f.latitude.toPrecision(4)} on {new Date(f.timestamp).toString().slice(0,15)}</div>
@@ -43,7 +45,7 @@ export default ({features}) => {
             <Line type="monotone" dataKey="value" stroke="#08f" dot={false} isAnimationActive = {false} />
           </LineChart>
           <div className="entry">
-            <div className="details">Mean depth of {meanDepth.toPrecision(3)} cm across {features.length} observations near {meanLongitude.toPrecision(4)}, {meanLatitude.toPrecision(4)}</div>
+            <div className="details">Mean depth of {meanDepth.toPrecision(3)} cm over {features.length} observations near {meanLongitude.toPrecision(4)}, {meanLatitude.toPrecision(4)}</div>
             <div className="source">Data from {sources.join(", ")}</div>
           </div>
         </div>
@@ -63,9 +65,11 @@ const style = css`
   .entry {
     padding: 0.5rem 0rem;
   }
-  .depth {
+  .depth, .highlight {
     font-weight: 500;
     color: #08f;
+  }
+  .depth {
     font-size: 1.5rem;
     text-align: center;
   }
