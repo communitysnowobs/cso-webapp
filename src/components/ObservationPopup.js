@@ -1,10 +1,36 @@
 import {Popup} from 'react-map-gl';
-import {LineChart, XAxis, YAxis, CartesianGrid, Line } from 'recharts'
+import {LineChart, BarChart, XAxis, YAxis, CartesianGrid, Line, Bar } from 'recharts'
 import css from 'styled-jsx/css'
 import moment from 'moment'
 
 const formatXAxis= (tickItem) => moment(tickItem).format('MM-DD-YYYY');
 
+const getMonthlyAverages = (features)  => {
+  let minDate = moment(features.reduce((min, f) => (f.timestamp < min) ? f.timestamp : min, features[0].timestamp))
+  let maxDate = moment(features.reduce((max, f) => (f.timestamp > max) ? f.timestamp : max, features[0].timestamp))
+  let months = {};
+
+  while (maxDate > minDate || minDate.format('M') === maxDate.format('M')) {
+     months[minDate.format('YYYY-MM')] = [];
+     minDate.add(1,'month');
+  }
+
+  const monthlyFeaturesDict = features.reduce((acc, f) => {
+    const month = moment(f.timestamp).format('YYYY-MM')
+    return {
+      ...acc,
+      [month]: (acc[month] || []).concat([f.depth])
+    }
+  }, months)
+
+  const monthlyFeatures = Object.entries(monthlyFeaturesDict).map(f => ({value: f[1], date: f[0]}))
+  const monthlyAverages = monthlyFeatures.map(f => ({
+    ...f,
+    value: f.value.reduce((sum, x) => sum + x, 0) / f.value.length
+  }))
+
+  return monthlyAverages
+}
 
 export default ({features}) => {
   // Compute aggregate information
@@ -12,6 +38,8 @@ export default ({features}) => {
   const meanLongitude = features.reduce((acc, f) => acc + f.longitude, 0)/features.length
   const meanDepth = features.reduce((acc, f) => acc + f.depth, 0)/features.length
   const sources = Array.from(new Set(features.map(f => f.source)))
+  const monthlyAverages = getMonthlyAverages(features)
+
   return (
     <Popup
       latitude={meanLatitude}
@@ -27,24 +55,21 @@ export default ({features}) => {
           <div className="source">Data from {f.source}</div>
         </div>
       ))) : (
-        <div>
-          <LineChart
-            width={200}
+        <div className = "chart">
+          <BarChart
+            width={275}
             height={150}
-            margin={{ top: 10, right: 10, bottom: -10, left: -25 }}
-            data={features.map(f => ({value: f.depth, date: new Date(f.timestamp).getTime()}))}>
+            margin={{ top: 20, right: 25, bottom: -10, left: -20 }}
+            data={monthlyAverages}>
             <XAxis
               dataKey="date"
-              tick={{fontSize: 8, textAnchor: 'middle'}}
-              tickCount={3}
+              tick={{fontSize: 9, textAnchor: 'middle'}}
               interval = {'preserveStartEnd'}
-              tickFormatter={formatXAxis}
-              type="number"
-              domain={['dataMin', 'dataMax']}/>
-            <YAxis tick={{fontSize: 8}}/>
-            <Line type="monotone" dataKey="value" stroke="#08f" dot={false} isAnimationActive = {false} />
-          </LineChart>
-          <div className="entry">
+            />
+            <YAxis tick={{fontSize: 9}}/>
+            <Bar type="monotone" dataKey="value" fill="#08f" />
+          </BarChart>
+          <div className="aggregateEntry">
             <div className="details">Mean depth of {meanDepth.toPrecision(3)} cm over {features.length} observations near {meanLongitude.toPrecision(4)}, {meanLatitude.toPrecision(4)}</div>
             <div className="source">Data from {sources.join(", ")}</div>
           </div>
@@ -56,14 +81,13 @@ export default ({features}) => {
 )}
 
 const style = css`
-  .root {
-    width: 100px;
-    min-width: 100px;
-    max-width: 100px;
-    max-height: 50vh;
-  }
   .entry {
-    padding: 0.5rem 0rem;
+    padding: 0.5rem 0.5rem;
+    width: 225px;
+  }
+  .aggregateEntry {
+    padding: 0.5rem 0.5rem;
+    width: 275px;
   }
   .depth, .highlight {
     font-weight: 500;
