@@ -13,21 +13,22 @@
     "push": "aws --profile cso s3 sync ./src/out s3://cso-app --acl public-read --exclude \"*.geojson\" --exclude \"*.html\" --cache-control max-age=2592000 && aws --profile cso s3 sync ./src/out s3://cso-app --acl public-read --exclude \"*\" --include \"*.html\""
   },
   "dependencies": {
+    "@emotion/core": "^10.0.7",
+    "@emotion/styled": "^10.0.7",
     "axios": "^0.18.0",
-    "deck.gl": "^6.3.3",
     "dotenv": "^6.0.0",
     "downloadjs": "^1.4.7",
+    "emotion": "10.0.7",
     "geojson": "^0.5.0",
     "mapbox-gl": "^0.52.0",
     "moment": "^2.22.2",
     "next": "^7.0.2",
-    "node-window-polyfill": "^1.0.0",
+    "ramda": "^0.26.1",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "react-map-gl": "^4.0.6",
-    "react-mapbox-gl": "^4.0.2",
     "react-no-ssr": "^1.1.0",
-    "react-select": "^2.1.1",
+    "react-select": "2.4.1",
     "recharts": "^1.4.2"
   }
 }

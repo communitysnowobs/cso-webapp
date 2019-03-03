@@ -131,7 +131,7 @@ export default () => (
       div .react_select__multi-value__label {
         color: #fff;
         font-family: 'avenir next', avenir, 'helvetica neue', helvetica, ubuntu, roboto, noto, 'segoe ui', arial, sans-serif;
-        font-weight: 500;
+        font-weight: 400;
         font-size: 16px;
         padding: 2px 5px;
       }

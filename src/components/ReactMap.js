@@ -1,3 +1,6 @@
+/** @jsx jsx */
+import { jsx, css, keyframes } from '@emotion/core'
+import styled from '@emotion/styled'
 import {Component} from 'react';
 import ReactMapGL, {NavigationControl} from 'react-map-gl';
 import Attribution from './Attribution.js'
@@ -5,9 +8,9 @@ import ObservationPopup from './ObservationPopup.js'
 import RadioGroup from './RadioGroup.js'
 import RadioItem from './RadioItem.js'
 import axios from 'axios'
-import css from 'styled-jsx/css'
+import * as R from 'ramda'
 
-import { drawStyle, clusterStyle, clusterCountStyle, snowObsStyle } from '../styles/map.js'
+import { layers, clusterParams } from '../data/map'
 
 class ReactMap extends Component {
 
@@ -24,148 +27,111 @@ class ReactMap extends Component {
         mapboxApiAccessToken: process.env.MAPBOX_TOKEN,
       },
       observations: null,
-      isMapLoaded: false,
-      selected: null,
+      selectedObservations: null,
+      clustering: "clustered",
+      mapReady: false,
+      layersReady: false,
+
     };
-
-    this.toggleClustered = this.toggleClustered.bind(this)
-    this.onClick = this.onClick.bind(this)
-    this.onResize = this.onResize.bind(this)
-    this.loadObservations = this.loadObservations.bind(this)
-    this.onMapLoad = this.onMapLoad.bind(this)
   }
 
-  componentDidMount() {
-    // Add listener for window resize events
-    window.addEventListener('resize', this.onResize)
-    // Fetch observations
-    this.loadObservations()
-  }
-
-  onClick(e) {
-    const selected = e.features
-      .filter(f => f.layer.id == "snow_obs" || f.layer.id == "snow_obs_unclustered")
-      .map(f => ({
-        longitude: f.geometry.coordinates[0],
-        latitude: f.geometry.coordinates[1],
-        author: f.properties.author,
-        source: f.properties.source,
-        depth: f.properties.depth,
-        timestamp: f.properties.timestamp
-      }))
-      .sort((x,y) => new Date(x.timestamp).getTime() - new Date(y.timestamp).getTime());
-    if (selected.length > 0) {
-      this.setState({selected})
-    }
-    else {
-      this.setState({selected: null})
-    }
-  }
-
-  // Resize map viewport on window resize event
-  onResize() {
-    this.setState({
-       viewport: {
-         ...this.state.viewport,
-         width: window.innerWidth,
-         height: window.innerHeight
-       }
-     })
-  }
-
-  // Add data once map and observations have been loaded
-  componentDidUpdate(prevProps, prevState) {
-    if ((!prevState.observations || !prevState.isMapLoaded) && (this.state.observations && this.state.isMapLoaded)) {
-      this.addSources();
-      this.addLayers();
-    }
-  }
-
-  async loadObservations() {
-    let res = await axios.get('/static/data.geojson')
-    this.setState({observations: res.data})
-  }
-
-  addSources() {
-    let map = this.mapRef.current.getMap()
-    map.addSource("obs_clustered", {
-        type: "geojson",
-        data: this.state.observations,
-        cluster: true,
-        clusterMaxZoom: 14,
-        clusterRadius: 75
-    });
-    map.addSource("obs_unclustered", {
-        type: "geojson",
-        data: this.state.observations,
-    });
-  }
-  addLayers() {
-    let map = this.mapRef.current.getMap()
-    map.addLayer({
-        id: "clusters",
-        type: "circle",
-        source: "obs_clustered",
-        filter: ["has", "point_count"],
-        ...clusterStyle
-    });
-    map.addLayer({
-        id: "cluster_count",
-        type: "symbol",
-        source: "obs_clustered",
-        filter: ["has", "point_count"],
-        ...clusterCountStyle
-    });
-    map.addLayer({
-        id: "snow_obs",
-        type: "circle",
-        source: "obs_clustered",
-        filter: ["!has", "point_count"],
-        ...snowObsStyle
-    });
-    map.addLayer({
-      id: "snow_obs_unclustered",
-      type: "circle",
-      source: "obs_unclustered",
-      layout: {
-        visibility: "none"
-      },
-      ...snowObsStyle
+  componentDidMount = () => {
+    // Resize map on window resize
+    window.addEventListener('resize', () =>
+      this.setState({
+         viewport: {
+           ...this.state.viewport,
+           width: window.innerWidth,
+           height: window.innerHeight
+         }
+       })
+     )
+    // Retrieve observations
+    axios.get('/static/data.geojson').then(res => {
+      this.setState({observations: res.data})
     })
   }
 
-  onMapLoad(e) {
-    this.setState({isMapLoaded:true})
-  }
+  componentDidUpdate = R.pipe(
+    R.nthArg(1), // state
+    R.when(
+      x => R.all(R.identity,
+        [(!x.observations || !x.mapReady),
+          this.state.observations,
+          this.state.mapReady
+        ]),
+      _ => { // add sources and layers when map and observations are ready
+        this.addSources()
+        this.addLayers()
+        this.setState({layersReady: true})
+      }
+    )
+  )
 
-  setLayerVisibility(layer, visibility) {
+  onClick = R.pipe(
+    R.prop('features'),
+    R.filter(R.pipe(R.prop('layer'), R.prop('id'), R.includes('snow_obs'))),
+    R.map(x => ({
+      longitude: x.geometry.coordinates[0],
+      latitude: x.geometry.coordinates[1],
+      author: x.properties.author,
+      source: x.properties.source,
+      depth: x.properties.depth,
+      timestamp: new Date(x.properties.timestamp).getTime()
+    })),
+    R.sortBy(R.prop('timestamp')),
+    R.ifElse(
+      R.isEmpty,
+      selectedObservations => this.setState({selectedObservations: null}),
+      selectedObservations => this.setState({selectedObservations})
+    )
+  )
+
+  onMapLoad = (_) => this.setState({mapReady:true})
+
+  addSources = () => {
     let map = this.mapRef.current.getMap()
-    map.setLayoutProperty(layer, 'visibility', visibility);
+    const base = { type: "geojson", data: this.state.observations }
+    const sources = {
+      obs_clustered : { ...base, ...clusterParams },
+      obs_unclustered : { ...base }
+    }
+    R.forEachObjIndexed((v,k) => map.addSource(k,v), sources)
   }
 
-  onCluster() {
-    this.setLayerVisibility("snow_obs_unclustered", "none")
-    this.setLayerVisibility("clusters", "visible")
-    this.setLayerVisibility("cluster_count", "visible")
-    this.setLayerVisibility("snow_obs", "visible")
+  addLayers = () => {
+    let map = this.mapRef.current.getMap()
+    R.forEachObjIndexed((v,k) => map.addLayer({...v, id: k}), layers)
   }
 
-  onUncluster() {
-    this.setLayerVisibility("snow_obs_unclustered", "visible")
-    this.setLayerVisibility("clusters", "none")
-    this.setLayerVisibility("cluster_count", "none")
-    this.setLayerVisibility("snow_obs", "none")
+  setLayerVisibility = (visible, layer) => {
+    let map = this.mapRef.current.getMap()
+    map.setLayoutProperty(layer, 'visibility', visible ? 'visible' : 'none');
   }
 
-  toggleClustered(value) {
-    if (value == "Clustered") this.onCluster();
-    else if (value == "Unclustered") this.onUncluster()
-  }
+  setClustered = R.when(
+    x => this.state.layersReady && this.state.clustering != x,
+    R.pipe(
+      R.tap(
+        (x => { console.log(x);this.setState({clustering: x})})
+      ),
+      R.equals(R.__, "clustered"),
+      R.tap(R.pipe(
+        R.curry(this.setLayerVisibility), //setLayerVisibility(isClustered, __)
+        R.forEach(R.__, ['clusters', 'cluster_count', 'snow_obs'])
+      )),
+      R.not(),
+      R.tap(R.pipe(
+        R.curry(this.setLayerVisibility), //setLayerVisibility(!isClustered, __)
+        R.forEach(R.__, ['snow_obs_unclustered'])
+      ))
+    )
+  )
 
   render() {
     return (
-      <div className = "root">
-        <ReactMapGL
+      <Wrapper className = "root">
+        <StyledMap
           {...this.state.viewport}
           ref={this.mapRef}
           className = {'map'}
@@ -175,53 +141,52 @@ class ReactMap extends Component {
           onClick={this.onClick}
           onLoad={this.onMapLoad}
         >
-          {this.state.selected &&
-            <ObservationPopup features={this.state.selected}/>
+          {this.state.selectedObservations &&
+            <ObservationPopup features={this.state.selectedObservations}/>
           }
-          <div style={{position: 'absolute', right: 12, top: 60}}>
+          <NavigationControlWrapper >
             <NavigationControl onViewportChange={(viewport) => this.setState({viewport})} />
-          </div>
-          <div className = "attribution">
+          </NavigationControlWrapper>
+          <AttributionWrapper className = "attribution">
             <Attribution/>
-          </div>
-          <div className = "clustering">
-            <RadioGroup initiallySelected = "Clustered" onItemChanged = {this.toggleClustered}>
+          </AttributionWrapper>
+          <Clustering className = "clustering">
+            <RadioGroup selected = {this.state.clustering} onClick = {this.setClustered}>
               <RadioItem title={"Clustered"} icon={"static/images/clustered.png"} />
               <RadioItem title={"Unclustered"} icon={"static/images/unclustered.png"}/>
             </RadioGroup>
-          </div>
-        </ReactMapGL>
-        <style jsx>{style}</style>
-      </div>
+          </Clustering>
+        </StyledMap>
+      </Wrapper>
     );
   }
 }
 
-const style = css`
-  .root {
-    position: relative;
-  }
-  .root > :global(div) {
-    background-color: #191a1a;
-  }
-  .map, .loading-overlay {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-  .clustering {
-    position: absolute;
-    left: 0.75rem;
-    bottom: 0.75rem;
-    z-index: 100;
-  }
-  .attribution {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-  }
+const Wrapper = styled.div`
+  position: relative;
+`
+const StyledMap = styled(ReactMapGL)`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+`
+const Clustering = styled.div`
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 100;
+`
+const AttributionWrapper = styled.div`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+`
+const NavigationControlWrapper = styled.div`
+  position: absolute;
+  right: 12px;
+  top: 60px;
 `
 
 export default ReactMap;

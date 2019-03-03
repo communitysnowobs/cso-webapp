@@ -136,3 +136,36 @@ export const clusterCountStyle = {
     "text-size": 12
   }
 }
+
+export const layers = {
+  clusters: {
+    type: "circle",
+    source: "obs_clustered",
+    filter: ["has", "point_count"],
+    ...clusterStyle
+  },
+  cluster_count: {
+    type: "symbol",
+    source: "obs_clustered",
+    filter: ["has", "point_count"],
+    ...clusterCountStyle
+  },
+  snow_obs: {
+    type: "circle",
+    source: "obs_clustered",
+    filter: ["!has", "point_count"],
+    ...snowObsStyle
+  },
+  snow_obs_unclustered: {
+    type: "circle",
+    source: "obs_unclustered",
+    layout: { visibility: "none" },
+    ...snowObsStyle
+  }
+}
+
+export const clusterParams = {
+  cluster: true,
+  clusterMaxZoom: 14,
+  clusterRadius: 75
+}

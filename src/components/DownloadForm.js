@@ -2,6 +2,7 @@ import {Component} from 'react';
 import Input from './Input'
 import Dropdown from './Dropdown'
 import Button from './Button'
+import LoadingIndicator from './LoadingIndicator'
 import css from 'styled-jsx/css'
 import download from 'downloadjs'
 import axios from 'axios'
@@ -32,22 +33,22 @@ class DownloadForm extends Component {
       bbox: "",
       providers: [],
       format: "",
+      loading: false,
     }
   }
 
   async onSubmit(item) {
-    // window.location.replace("https://api.communitysnowobs.org/obs?limit=10000&format=geojson");
+    this.setState({loading: true})
     let providers = this.state.providers.map(x => x.value)
     let format = this.state.format.value
     let params = {
-      start_date: this.state.startDate || null,
-      end_date: this.state.endDate || null,
-      src: providers != [] ? providers.join(",") : null,
+      startDate: this.state.startDate || null,
+      endDate: this.state.endDate || null,
+      providers: providers != [] ? providers.join(",") : null,
       bbox: this.state.bbox || null,
       format: format || null,
-      limit: 10000
+      limit: 100000
     }
-
 
     let response = await axios.get('https://api.communitysnowobs.org/observations', { transformResponse: undefined, params: params})
     if (format == 'csv') {
@@ -57,13 +58,13 @@ class DownloadForm extends Component {
       download(response.data, 'cso.geojson', 'application/vnd.geo+json')
     }
 
-
     this.setState({
       startDate: "",
       endDate: "",
       bbox: "",
       format: "",
-      providers: []
+      providers: [],
+      loading: false
     })
   }
 
@@ -105,7 +106,7 @@ class DownloadForm extends Component {
             <Input
               title="End Date"
               subtitle="YYYY-MM-DD"
-              placeholder="2018-10-30"
+              placeholder="2019-12-31"
               value = {this.state.endDate}
               onChange= {(e) => this.onChange(e, "endDate")}
             />
@@ -135,7 +136,7 @@ class DownloadForm extends Component {
               onChange={this.onFormatChange}
               value={this.state.format}
             />
-          <Button title="Download Data" onClick = {this.onSubmit}/>
+          <Button title="Download Data" onClick = {this.onSubmit} loading = {this.state.loading}/>
           <style jsx>{style}</style>
       </div>
     )

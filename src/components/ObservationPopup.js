@@ -2,12 +2,11 @@ import {Popup} from 'react-map-gl';
 import {LineChart, BarChart, XAxis, YAxis, CartesianGrid, Line, Bar } from 'recharts'
 import css from 'styled-jsx/css'
 import moment from 'moment'
-
-const formatXAxis= (tickItem) => moment(tickItem).format('MM-DD-YYYY');
+import * as R from 'ramda'
 
 const getMonthlyAverages = (features)  => {
-  let minDate = moment(features.reduce((min, f) => (f.timestamp < min) ? f.timestamp : min, features[0].timestamp))
-  let maxDate = moment(features.reduce((max, f) => (f.timestamp > max) ? f.timestamp : max, features[0].timestamp))
+  let minDate = moment(R.reduce(R.min, Infinity, R.map(R.prop('timestamp'), features)))
+  let maxDate = moment(R.reduce(R.max, -Infinity, R.map(R.prop('timestamp'), features)))
   let months = {};
 
   while (maxDate > minDate || minDate.format('M') === maxDate.format('M')) {
@@ -34,10 +33,10 @@ const getMonthlyAverages = (features)  => {
 
 export default ({features}) => {
   // Compute aggregate information
-  const meanLatitude = features.reduce((acc, f) => acc + f.latitude, 0)/features.length
-  const meanLongitude = features.reduce((acc, f) => acc + f.longitude, 0)/features.length
-  const meanDepth = features.reduce((acc, f) => acc + f.depth, 0)/features.length
-  const sources = Array.from(new Set(features.map(f => f.source)))
+  const meanLatitude = R.mean(R.map(x => x.latitude, features))
+  const meanLongitude = R.mean(R.map(x => x.longitude, features))
+  const meanDepth = R.mean(R.map(x => x.depth, features))
+  const sources = R.uniq(R.map(x => x.source, features))
   const monthlyAverages = getMonthlyAverages(features)
 
   return (

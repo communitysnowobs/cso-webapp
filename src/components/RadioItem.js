@@ -2,7 +2,7 @@ import {Popup} from 'react-map-gl';
 import css from 'styled-jsx/css'
 
 export default ({title, icon, selected, onClick}) => (
-  <div className = {["root", selected ? "selected" : "unselected"].join(" ")} onClick={() => onClick(title)}>
+  <div className = {["root", selected ? "selected" : "unselected"].join(" ")} onClick={onClick}>
     <img className = "icon" src={icon}/>
     <div className = "title">{title}</div>
     <style jsx>{style}</style>
