@@ -1,5 +1,6 @@
-import css from 'styled-jsx/css'
-import dynamic from 'next/dynamic'
+/** @jsx jsx */
+import { jsx, css } from '@emotion/core'
+import styled from '@emotion/styled'
 import Dropdown from '../components/Dropdown'
 import Button from '../components/Button'
 import Input from '../components/Input'
@@ -16,19 +17,17 @@ const options = [
 ]
 
 export default () => (
-  <div className = "root">
+  <Wrapper>
     <Meta />
     <Nav downloadButton = {false}/>
     <DownloadForm/>
-    <style jsx>{style}</style>
-  </div>
+  </Wrapper>
 )
 
-const style = css`
-  .root {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    background-color: rgb(12, 12, 12);
-  }
+
+const Wrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: rgb(12, 12, 12);
 `

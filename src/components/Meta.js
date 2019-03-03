@@ -95,50 +95,6 @@ export default () => (
       .mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-content {
         border-bottom-right-radius: 0px !important;
       }
-      div .react_select__control {
-        box-shadow: none;
-        background-color: rgb(12,12,12);
-        outline: none;
-        border-color: #08f;
-        border-width: 2px;
-        border-radius: 8px;
-        padding-left: 2px;
-        padding-top: 3px;
-        padding-bottom: 0px;
-      }
-      div .react_select__control:hover {
-        border-color: #08f;
-      }
-      div .react_select__menu {
-        border-radius: 8px;
-        overflow: none;
-      }
-      div .react_select__value-container {
-        padding: 3px;
-      }
-      div .react_select__indicator-separator {
-        display: none;
-      }
-      div .react_select__single-value {
-        color: white;
-      }
-      div .react_select__multi-value {
-        color: #fff;
-        background-color: #08f;
-        margin-right: 6px;
-        margin-bottom: 5px;
-      }
-      div .react_select__multi-value__label {
-        color: #fff;
-        font-family: 'avenir next', avenir, 'helvetica neue', helvetica, ubuntu, roboto, noto, 'segoe ui', arial, sans-serif;
-        font-weight: 400;
-        font-size: 16px;
-        padding: 2px 5px;
-      }
-      div .react_select__multi-value__remove:hover {
-        background-color: #08f;
-        color: white;
-      }
     `}</style>
   </div>
 )

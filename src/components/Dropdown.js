@@ -1,37 +1,36 @@
+/** @jsx jsx */
 import Select from 'react-select'
-import css from 'styled-jsx/css'
+import { jsx, css } from '@emotion/core'
+import styled from '@emotion/styled'
 
-export default ({options, instanceId, placeholder, title, subtitle, onChange, value, isMulti}) => (
-  <div className = "root">
-      <div className = "title">{title}</div>
-      <div className = "subtitle">{subtitle} </div>
-        <div className = "container">
-        <Select styles={customStyles} placeholder={placeholder} options={options} isMulti={isMulti} isClearable={false} onChange={onChange} value={value}/>
-        </div>
-      <style jsx>{style}</style>
-  </div>
+export default ({options, id, placeholder, title, subtitle, onChange, value, isMulti}) => (
+  <Wrapper>
+    <Title>{title}</Title>
+    <Subtitle>{subtitle} </Subtitle>
+    <SelectWrapper>
+      <Select instanceId={id} styles={customStyles} placeholder={placeholder} options={options} isMulti={isMulti} isClearable={false} onChange={onChange} value={value}/>
+    </SelectWrapper>
+  </Wrapper>
 )
 
-const style = css`
-.title {
+const Wrapper = styled.div`
+  margin-bottom: 24px;
+`
+const SelectWrapper = styled.div`
+  height: 40px;
+`
+const Title = styled.div`
   color: #fff;
   width: 100%;
   font-weight: 500;
   font-size: 1rem;
-}
-.subtitle {
+`
+const Subtitle = styled.div`
   color: #aaa;
   width: 100%;
   font-weight: 500;
   font-size: 0.75rem;
   margin-bottom: 0.5rem;
-}
-  .container {
-    height: 40px;
-  }
-  .root {
-    margin-bottom: 24px;
-  }
 `
 
 const customStyles = {

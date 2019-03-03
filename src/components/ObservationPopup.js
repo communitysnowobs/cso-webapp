@@ -1,6 +1,8 @@
+/** @jsx jsx */
+import { jsx, css } from '@emotion/core'
+import styled from '@emotion/styled'
 import {Popup} from 'react-map-gl';
 import {LineChart, BarChart, XAxis, YAxis, CartesianGrid, Line, Bar } from 'recharts'
-import css from 'styled-jsx/css'
 import moment from 'moment'
 import * as R from 'ramda'
 
@@ -8,27 +10,19 @@ const getMonthlyAverages = (features)  => {
   let minDate = moment(R.reduce(R.min, Infinity, R.map(R.prop('timestamp'), features)))
   let maxDate = moment(R.reduce(R.max, -Infinity, R.map(R.prop('timestamp'), features)))
   let months = {};
+  R.until(R.gt(R.__, maxDate), (x => {months[x.format('YYYY-MM')] = []; return x.add(1, 'month')}), minDate)
 
-  while (maxDate > minDate || minDate.format('M') === maxDate.format('M')) {
-     months[minDate.format('YYYY-MM')] = [];
-     minDate.add(1,'month');
-  }
-
-  const monthlyFeaturesDict = features.reduce((acc, f) => {
-    const month = moment(f.timestamp).format('YYYY-MM')
-    return {
-      ...acc,
-      [month]: (acc[month] || []).concat([f.depth])
-    }
-  }, months)
-
-  const monthlyFeatures = Object.entries(monthlyFeaturesDict).map(f => ({value: f[1], date: f[0]}))
-  const monthlyAverages = monthlyFeatures.map(f => ({
-    ...f,
-    value: f.value.reduce((sum, x) => sum + x, 0) / f.value.length
-  }))
-
-  return monthlyAverages
+  return R.pipe(
+      R.reduceBy( // List of depths grouped by months
+        (acc, {depth}) => R.append(depth, acc),
+        [],
+        ({timestamp}) => moment(timestamp).format('YYYY-MM')
+      ),
+      R.mergeWith(R.concat, months), // Add empty months
+      R.mapObjIndexed(R.mean), // Take mean of depths
+      R.toPairs, // Convert to list
+      R.map(([x,y] = [0,1]) => ({value: y, date: x})) // Map to objects
+    )(features)
 }
 
 export default ({features}) => {
@@ -48,13 +42,13 @@ export default ({features}) => {
     >
     {features.length <= 3 ?
       (features.map(f => (
-        <div className="entry" key = {f.depth}>
-          <div className="depth">{Number.parseFloat(f.depth).toPrecision(3)} cm</div>
-          <div className="details">Reported by {f.author} at {f.longitude.toPrecision(4)}, {f.latitude.toPrecision(4)} on {new Date(f.timestamp).toString().slice(0,15)}</div>
-          <div className="source">Data from {f.source}</div>
-        </div>
+        <Entry key = {f.depth}>
+          <Depth>{Number.parseFloat(f.depth).toPrecision(3)} cm</Depth>
+          <Details>Reported by {f.author} at {f.longitude.toPrecision(4)}, {f.latitude.toPrecision(4)} on {new Date(f.timestamp).toString().slice(0,15)}</Details>
+          <Source>Data from {f.source}</Source>
+        </Entry>
       ))) : (
-        <div className = "chart">
+        <div>
           <BarChart
             width={275}
             height={150}
@@ -68,43 +62,38 @@ export default ({features}) => {
             <YAxis tick={{fontSize: 9}}/>
             <Bar type="monotone" dataKey="value" fill="#08f" />
           </BarChart>
-          <div className="aggregateEntry">
-            <div className="details">Mean depth of {meanDepth.toPrecision(3)} cm over {features.length} observations near {meanLongitude.toPrecision(4)}, {meanLatitude.toPrecision(4)}</div>
-            <div className="source">Data from {sources.join(", ")}</div>
-          </div>
+          <AggregateEntry>
+            <Details>Mean depth of {meanDepth.toPrecision(3)} cm over {features.length} observations near {meanLongitude.toPrecision(4)}, {meanLatitude.toPrecision(4)}</Details>
+            <Source>Data from {sources.join(", ")}</Source>
+          </AggregateEntry>
         </div>
       )
     }
-    <style jsx>{style}</style>
   </Popup>
 )}
 
-const style = css`
-  .entry {
-    padding: 0.5rem 0.5rem;
-    width: 225px;
-  }
-  .aggregateEntry {
-    padding: 0.5rem 0.5rem;
-    width: 275px;
-  }
-  .depth, .highlight {
-    font-weight: 500;
-    color: #08f;
-  }
-  .depth {
-    font-size: 1.5rem;
-    text-align: center;
-  }
-  .details {
-    color: #999;
-    font-size: 0.75rem;
-    text-align: center;
-  }
-  .source {
-    color: #555;
-    padding-top: 0.25rem;
-    font-size: 0.6rem;
-    text-align: center;
-  }
+const Entry = styled.div`
+  padding: 0.5rem 0.5rem;
+  width: 225px;
+`
+const AggregateEntry = styled.div`
+  padding: 0.5rem 0.5rem;
+  width: 275px;
+`
+const Depth = styled.div`
+  font-weight: 500;
+  color: #08f;
+  font-size: 1.5rem;
+  text-align: center;
+`
+const Details = styled.div`
+  color: #999;
+  font-size: 0.75rem;
+  text-align: center;
+`
+const Source = styled.div`
+  color: #555;
+  padding-top: 0.25rem;
+  font-size: 0.6rem;
+  text-align: center;
 `

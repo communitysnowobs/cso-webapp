@@ -3,11 +3,11 @@ import { jsx, css, keyframes } from '@emotion/core'
 import styled from '@emotion/styled'
 
 export default ({showDownloadButton}) => (
-  <Wrapper className = 'root'>
-    <Title href = "/" >CSO <Highlight>Data</Highlight></Title>
-    { showDownloadButton &&
-      <Download href = "/download">Download Data</Download>
-    }
+  <Wrapper>
+    <Title href = "/" >
+      CSO <Highlight>Data</Highlight>
+    </Title>
+    {showDownloadButton && <Download href = "/download">Download Data</Download>}
   </Wrapper>
 )
 
@@ -51,4 +51,5 @@ const Title = styled.a`
 
 const Highlight = styled.span`
   color: #08f;
+  font-weight: 400;
 `

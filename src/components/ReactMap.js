@@ -130,11 +130,10 @@ class ReactMap extends Component {
 
   render() {
     return (
-      <Wrapper className = "root">
+      <Wrapper>
         <StyledMap
           {...this.state.viewport}
           ref={this.mapRef}
-          className = {'map'}
           mapStyle={process.env.MAPBOX_STYLE}
           attributionControl={false}
           onViewportChange={(viewport) => this.setState({viewport})}
@@ -147,10 +146,10 @@ class ReactMap extends Component {
           <NavigationControlWrapper >
             <NavigationControl onViewportChange={(viewport) => this.setState({viewport})} />
           </NavigationControlWrapper>
-          <AttributionWrapper className = "attribution">
+          <AttributionWrapper>
             <Attribution/>
           </AttributionWrapper>
-          <Clustering className = "clustering">
+          <Clustering>
             <RadioGroup selected = {this.state.clustering} onClick = {this.setClustered}>
               <RadioItem title={"Clustered"} icon={"static/images/clustered.png"} />
               <RadioItem title={"Unclustered"} icon={"static/images/unclustered.png"}/>
