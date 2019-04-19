@@ -100,11 +100,11 @@ export const clusterStyle = {
     "circle-color": [
       "step",
       ["get", "point_count"],
-      "#08f",
+      "#2398ff",
       100,
-      "#08f",
+      "#2398ff",
       750,
-      "#08f"
+      "#2398ff"
     ],
     "circle-radius": [
       "step",
@@ -122,7 +122,7 @@ export const clusterStyle = {
 
 export const snowObsStyle = {
   paint: {
-    "circle-color": "#08f",
+    "circle-color": "#2398ff",
     "circle-radius": 6,
     "circle-stroke-width": 2,
     "circle-stroke-color": "#fff"

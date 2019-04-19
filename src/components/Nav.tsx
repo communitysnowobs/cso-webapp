@@ -4,8 +4,12 @@ import styled from '@emotion/styled'
 import { A } from './Common'
 import { NextFC } from "next"
 
-const Nav: NextFC = () => (
-  <Title href="/">
+interface Props {
+  className?: string
+}
+
+const Nav: NextFC<Props> = ({className}) => (
+  <Title className = {className} href="/">
     Community Snow Observations Data
   </Title>
 )

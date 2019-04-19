@@ -1,14 +1,13 @@
 /** @jsx jsx */
-import React, { Component } from "react";
 import { jsx, css, keyframes } from '@emotion/core'
+import { NextFC } from "next";
 import styled from '@emotion/styled'
 
-
-const LoadingIndicator = ({className}) => (
+const LoadingIndicator: NextFC<{}> = () => (
   <Wrapper>
-    <Dot className = {className} delay="0s" />
-    <Dot className = {className} delay=".1s" />
-    <Dot className = {className} delay=".2s" />
+    <Dot delay="0s" />
+    <Dot delay=".1s" />
+    <Dot delay=".2s" />
   </Wrapper>
 )
 
@@ -25,7 +24,7 @@ const Wrapper = styled.div`
   height: 100%;
 `;
 
-const Dot = styled.div`
+const Dot = styled.div<{delay: string}>`
   background-color: white;
   border-radius: 50%;
   width: 8px;

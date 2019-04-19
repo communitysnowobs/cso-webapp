@@ -1,13 +1,20 @@
 /** @jsx jsx */
-import { jsx, css, keyframes } from '@emotion/core'
+// import { jsx, css, keyframes } from '@emotion/core'
 import styled from '@emotion/styled'
+import { NextFC } from "next";
 import LoadingIndicator from './LoadingIndicator'
 
-export default ({title, onClick, loading}) => (
-  <Wrapper onClick = {onClick}>
-      {!loading ? title : <LoadingIndicator/>}
-  </Wrapper>
-)
+interface Props {
+  title: string,
+  onClick: any,
+  loading: boolean
+}
+
+const Button: NextFC<Props> = ({title, onClick, loading}) => (
+    <Wrapper onClick = {onClick} >
+        {!loading ? title : <LoadingIndicator />}
+    </Wrapper>
+  )
 
 const Wrapper = styled.div`
     border-radius: 8px;
@@ -26,3 +33,5 @@ const Wrapper = styled.div`
       background-color: #0074D9;
     }
 `
+
+export default Button

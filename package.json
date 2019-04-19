@@ -13,9 +13,21 @@
     "push": "aws --profile cso s3 sync ./src/out s3://cso-app --acl public-read --exclude \"*.geojson\" --exclude \"*.html\" --cache-control max-age=2592000 && aws --profile cso s3 sync ./src/out s3://cso-app --acl public-read --exclude \"*\" --include \"*.html\""
   },
   "dependencies": {
+    "@emotion/babel-preset-css-prop": "^10.0.9",
     "@emotion/core": "^10.0.7",
     "@emotion/styled": "^10.0.7",
+    "@mapbox/mapbox-gl-draw": "^1.1.1",
+    "@turf/turf": "^5.1.6",
+    "@types/next": "^8.0.3",
+    "@types/ramda": "^0.26.7",
+    "@types/react": "^16.8.13",
+    "@types/react-dom": "^16.8.4",
+    "@types/react-map-gl": "^4.1.1",
+    "@types/react-no-ssr": "^1.1.1",
+    "@types/recharts": "^1.1.16",
+    "@zeit/next-typescript": "^1.1.1",
     "axios": "^0.18.0",
+    "deck.gl": "^6.4.5",
     "dotenv": "^6.0.0",
     "downloadjs": "^1.4.7",
     "emotion": "10.0.7",
@@ -30,6 +42,7 @@
     "react-map-gl": "^4.0.6",
     "react-no-ssr": "^1.1.0",
     "react-select": "^2.4.1",
-    "recharts": "^1.4.2"
+    "recharts": "^1.4.2",
+    "typescript": "^3.4.3"
   }
 }
