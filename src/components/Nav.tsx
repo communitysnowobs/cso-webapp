@@ -8,8 +8,8 @@ interface Props {
   className?: string
 }
 
-const Nav: NextFC<Props> = ({className}) => (
-  <Title className = {className} href="/">
+const Nav: NextFC<Props> = ({ className }) => (
+  <Title className={className} href="/">
     Community Snow Observations Data
   </Title>
 )

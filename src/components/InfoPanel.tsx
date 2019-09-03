@@ -9,13 +9,12 @@ import { Observation } from '../types/Observation'
 import { AreaChart, ChartPoint } from './Chart'
 import Table, {Column} from './Table'
 import { A } from './Common'
+import { AppContext } from './AppContext'
+import { ObservationsContext } from '../context/Observations';
+import { FunctionalContext } from '../context/Functional';
 
 type Aggregation = (values: Array<number> | Array<string>) => string | Array<string> | number | Array<number>
 type ChartAggregation = (values: Array<number> | Array<string>, key: string) =>  ChartPoint | Array<ChartPoint>
-
-interface Props {
-  features: Array<Observation>
-}
 
 interface LineItemProps {
   name: String,
@@ -29,11 +28,11 @@ const urls = {
 }
 
 // Aggregate using the following functions to avoid excessive looping over large feature collections
-const aggregate = (features: Array<Observation>, aggregations: Record<string, Aggregation>) : Record<string, number | string>=> {
+const aggregate = (features: Array<any>, aggregations: Record<string, Aggregation>) : Record<string, number | string>=> {
   return R.applySpec(aggregations)(features) as Record<string, number | string>
 }
 
-const aggregateMonthly = (features: Array<Observation>, aggregations: Record<string, ChartAggregation>) : Record<string, Array<ChartPoint>> => {
+const aggregateMonthly = (features: Array<any>, aggregations: Record<string, ChartAggregation>) : Record<string, Array<ChartPoint>> => {
   const minDate = moment(R.reduce(R.min, Infinity, R.map(R.prop('timestamp'), features)))
   const maxDate = moment(R.reduce(R.max, -Infinity, R.map(R.prop('timestamp'), features)))
   const months : Record<string, ChartPoint> = {};
@@ -100,52 +99,44 @@ const LineItem : NextFC<LineItemProps> =  ({name, value}) => (
   </MetaRow>
 )
 
-const Panel: NextFC<Props> = ({features}) => {
-  console.log("render")
-  // Compute aggregate information
-  const {
-    meanDepth,
-    minDepth,
-    maxDepth,
-    meanElevation,
-    minElevation,
-    maxElevation,
-    minTimestamp,
-    maxTimestamp,
-    contributors,
-    sources
-  } = aggregate(features, aggregations)
+const Panel: NextFC<{}> = () => {
 
-  const {
-    monthlyAverages,
-    monthlyCounts
-  } = aggregateMonthly(features, monthlyAggregations)
+  const observations = React.useContext(ObservationsContext)
+  const fn = React.useContext(FunctionalContext)
+
+  const selected = observations.selected
+  const parsedObservations = selected.map(fn.observations.parse).sort((a,b) => b.timestamp - a.timestamp)
+
+  // Compute aggregate information
+  const agg = aggregate(parsedObservations, aggregations)
+  const aggMonthly = aggregateMonthly(parsedObservations, monthlyAggregations)
 
   return (
-    <Wrapper>
-      <Header>
-        <Title>{features.length}</Title>
-        <Subtitle>{"Observations"}</Subtitle>
-      </Header>
-      <HiddenDivider/>
-      { React.Children.toArray(R.flatten(R.intersperse(<Divider/>, [
-        <LineItem name = {"Mean Depth"} value={meanDepth.toPrecision(3) + " cm"}/>,
-        <LineItem name = {"Mean Elevation"} value={meanElevation.toFixed(1) + " m"}/>,
-        <LineItem name = {"Depth Range"} value={minDepth.toFixed(1) + " cm - " + maxDepth.toFixed(1) + " cm"}/>,
-        <LineItem name = {"Elevation Range"} value={minElevation.toFixed(1) + " m - " + maxElevation.toFixed(1) + " m"}/>,
-        <LineItem name = {"Providers"} value={R.intersperse(", ", R.map(x => <A href={urls[x]} key={x} target={"_blank"}>{x}</A>, sources))}/>,
-        <LineItem name = {"Contributors"} value={contributors}/>,
-        <LineItem name = {"Temporal Extent"} value={moment(minTimestamp).format("MMM Do YYYY, HH:mm A") + " - " + moment(maxTimestamp).format("MMM Do YYYY, hh:mm A")}/>,
-        [<MetaTitle>{"Depth Plot"}</MetaTitle>,
-         <AreaChart data={monthlyAverages} unit={"cm"} css={{margin: "0.75rem 0"}}/>],
-        [<MetaTitle>{"Frequency Plot"}</MetaTitle>,
-         <AreaChart data={monthlyCounts} unit={"/mo"} css={{margin: "0.75rem 0"}}/>],
-        [<MetaTitle>{"Observations"}</MetaTitle>,
-         <Table columns={tableFormatters} features={features} css={{margin: "0.75rem 0"}}/>]])))}
-      <Footer>
-        <Button>Download</Button>
-      </Footer>
-    </Wrapper>)}
+          <Wrapper>
+            <Header>
+              <Title>{selected.length}</Title>
+              <Subtitle>{"Observations"}</Subtitle>
+            </Header>
+            <HiddenDivider/>
+            { React.Children.toArray(R.flatten(R.intersperse(<Divider/>, [
+              <LineItem name = {"Mean Depth"} value={agg.meanDepth.toPrecision(3) + " cm"}/>,
+              <LineItem name = {"Mean Elevation"} value={agg.meanElevation.toFixed(1) + " m"}/>,
+              <LineItem name = {"Depth Range"} value={agg.minDepth.toFixed(1) + " cm - " + agg.maxDepth.toFixed(1) + " cm"}/>,
+              <LineItem name = {"Elevation Range"} value={agg.minElevation.toFixed(1) + " m - " + agg.maxElevation.toFixed(1) + " m"}/>,
+              <LineItem name = {"Providers"} value={R.intersperse(", ", R.map(x => <A href={urls[x]} key={x} target={"_blank"}>{x}</A>, agg.sources))}/>,
+              <LineItem name = {"Contributors"} value={agg.contributors}/>,
+              <LineItem name = {"Temporal Extent"} value={moment(agg.minTimestamp).format("MMM Do YYYY, HH:mm A") + " - " + moment(agg.maxTimestamp).format("MMM Do YYYY, hh:mm A")}/>,
+              [<MetaTitle>{"Depth Plot"}</MetaTitle>,
+              <AreaChart data={aggMonthly.monthlyAverages} unit={"cm"} css={{margin: "0.75rem 0"}}/>],
+              [<MetaTitle>{"Frequency Plot"}</MetaTitle>,
+              <AreaChart data={aggMonthly.monthlyCounts} unit={"/mo"} css={{margin: "0.75rem 0"}}/>],
+              [<MetaTitle>{"Observations"}</MetaTitle>,
+              <Table columns={tableFormatters} features={parsedObservations} css={{margin: "0.75rem 0"}}/>]])))}
+            <Footer>
+              <Button>Download</Button>
+            </Footer>
+          </Wrapper>)
+}
 
 const Wrapper = styled.div`
   position: fixed;
@@ -222,5 +213,5 @@ const Subtitle = styled.div`
   text-align: center;
   width: 100%;
 `
-// Avoid unnecessary renders if features have not changed
-export default React.memo(Panel, (prevProps: Props, nextProps: Props) => prevProps.features === nextProps.features)
+
+export default Panel

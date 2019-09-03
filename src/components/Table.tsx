@@ -1,6 +1,7 @@
 /** @jsx jsx */
-import { jsx} from '@emotion/core'
+import { jsx } from '@emotion/core'
 import styled from '@emotion/styled'
+import * as React from 'react'
 import { NextFC } from "next"
 
 export interface Column {
@@ -26,19 +27,69 @@ const renderFeature = (feature: {}, columns: Column[], even: boolean) => (
   </tr>
 )
 
-const Table: NextFC<Props> = ({features, columns, className}) => (
-  <Wrapper className={className}>
-    <Scroller>
-      <TableEl>
-        <thead>
-          {renderHeader(columns)}
-        </thead>
-        <tbody>
-          {features.slice(0,100).map((feature, i) => renderFeature(feature, columns, i % 2 == 1))}
-        </tbody>
-      </TableEl>
-    </Scroller>
-  </Wrapper>)
+const Table: NextFC<Props> = ({ features, columns, className }) => {
+
+  const [page, setPage] = React.useState(1)
+  const pages = Math.ceil(features.length / 100)
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  const nextPage = () => {
+    setPage(Math.min(page + 1, pages))
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0
+    }
+  }
+
+  const previousPage = () => {
+    setPage(Math.max(page - 1, 1))
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0
+    }
+  }
+
+  // Reset page when features changes
+  React.useEffect(() => setPage(1), [features])
+
+  return (
+    <Wrapper className={className}>
+      <Scroller ref={scrollRef}>
+        <TableEl>
+          <thead>
+            {renderHeader(columns)}
+          </thead>
+          <tbody>
+            {features.slice((page - 1) * 100, page * 100).map((feature, i) => renderFeature(feature, columns, i % 2 == 1))}
+          </tbody>
+        </TableEl>
+      </Scroller>
+      {features.length > 100 &&
+        <Footer>
+          <Arrow src="/static/images/left-arrow.png" onClick={previousPage} />
+          <PageNo>{"Page " + page + " of " + pages}</PageNo>
+          <Arrow src="/static/images/right-arrow.png" onClick={nextPage} />
+        </Footer>}
+    </Wrapper>
+  );
+}
+const PageNo = styled.div({
+  fontSize: '14px',
+  color: "#2A2A2A",
+  margin: '0rem 2rem'
+})
+
+const Arrow = styled.img({
+  objectFit: "contain",
+  height: '1.75rem',
+  borderRadius: '5px'
+})
+
+const Footer = styled.div({
+  height: "2.75rem",
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderTop: "1px solid #D7D7D7"
+})
 
 const Wrapper = styled.div({
   border: "1px solid #D7D7D7",
@@ -48,7 +99,11 @@ const Wrapper = styled.div({
 
 const Scroller = styled.div({
   overflow: 'scroll',
-  maxHeight: '300px'
+  maxHeight: '320px',
+  height: 'auto',
+  '::-webkit-scrollbar': {
+    display: 'none'
+  }
 })
 
 const TableEl = styled.table({
@@ -96,7 +151,7 @@ const Td = styled.td({
   border: "1px solid #D7D7D7",
   width: "1px",
   whiteSpace: "nowrap"
-}, (props : {even? : boolean}) => ({
+}, (props: { even?: boolean }) => ({
   backgroundColor: props.even ? "#F0F0F0" : "#FFF"
 }))
 
