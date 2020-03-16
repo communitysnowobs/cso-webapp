@@ -3,4 +3,6 @@ node_modules
 .env
 _next
 
-.DS_Store
+**/.DS_Store
+
+**/out
