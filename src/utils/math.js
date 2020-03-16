@@ -17,7 +17,7 @@ const setProduct = product => {
 export const cartesian = setProduct((a, b) => [].concat(a, b));
 
 // Defines analogue of cartesian product defined using strings
-// Ex: ["a","b"] * ["c","d"] is ["a/c","a/d","b/c", "b/d"]
+// Ex: ['a','b'] * ['c','d'] is ['a/c','a/d','b/c', 'b/d']
 export const keyProduct = setProduct((a, b) => a + '/' + b);
 
 // Returns a range of integers

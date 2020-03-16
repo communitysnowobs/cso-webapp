@@ -4,7 +4,7 @@ import { withStyle, styled } from 'styletron-react';
 
 const HideCloseButton = withStyle(SecondaryButton, ({ $theme }) => ({
   display: 'inline-block',
-  padding: "0.5rem",
+  padding: '0.5rem',
   fontFamily: $theme.typography.font200.fontFamily,
   fontSize: $theme.typography.font200.fontSize,
   boxShadow: '0px 0px 40px #A0A0A0',

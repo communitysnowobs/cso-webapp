@@ -13,7 +13,7 @@ module.exports = withCSS({
       acc[`process.env.${curr}`] = JSON.stringify(process.env[curr]);
       return acc;
     }, {});
-    config.node = {...config.node, fs: "empty" }
+    config.node = {...config.node, fs: 'empty' }
     config.plugins.push(new webpack.DefinePlugin(env));
     config.externals = config.externals || {};
     config.externals['styletron-server'] = 'styletron-server';

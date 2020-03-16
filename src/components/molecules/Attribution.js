@@ -4,7 +4,7 @@ import { observationProviders, mapDataProviders } from '../../config/providers'
 import { map, intersperse } from '../../utils/objects';
 import { stringHash } from '../../utils/math'
 
-const AttributionLink = withWrapper(Link, Styled => props => <Styled {...props} color={"black"} />)
+const AttributionLink = withWrapper(Link, Styled => props => <Styled {...props} color={'black'} />)
 
 const Attribution = ({ className }) => (
   <div

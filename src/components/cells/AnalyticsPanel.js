@@ -32,8 +32,8 @@ const InnerWrapper = styled('div', {
 });
 
 const PanelSection = styled('div', {
-  padding: "initial",
-  margin: "0 0 1rem 0",
+  padding: 'initial',
+  margin: '0 0 1rem 0',
 });
 
 const _renderAggregation = features => agg => (

@@ -33,7 +33,7 @@ const slider = ({ name, bounds, selected, setSelected, display, step }) => {
             </div>
           ),
           ThumbValue: ({ $value }) => null,
-          Thumb: () => (
+          Thumb: ({ $theme }) => (
             <div
               className={useCss({
                 position: 'absolute',
@@ -41,7 +41,7 @@ const slider = ({ name, bounds, selected, setSelected, display, step }) => {
                 borderRadius: '4px',
                 width: '3px',
                 backgroundColor: '#fff',
-                border: '3px solid #08f',
+                border: `3px solid ${theme.colors.primary}`,
                 height: '16px'
               })}
             ></div>

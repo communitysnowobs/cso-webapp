@@ -8,8 +8,8 @@ import { styled } from 'baseui';
 const Heading = styled('div', ({ $theme, padding, margin, css = {} }) => ({
     fontWeight: 700,
     fontSize: $theme.sizing.scale10,
-    padding: padding || "initial",
-    margin: margin || "0 0 1rem",
+    padding: padding || 'initial',
+    margin: margin || '0 0 1rem',
     ...css
 }));
 

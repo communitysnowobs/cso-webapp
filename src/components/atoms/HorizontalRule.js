@@ -11,7 +11,7 @@ const HorizontalRule = styled(
   ({ $theme, padding, margin, css = {} }) => ({
     height: '1px',
     backgroundColor: $theme.colors.primary300,
-    padding: padding || "initial",
+    padding: padding || 'initial',
     margin: margin || spacingHorizontal($theme.sizing.scale600),
     ...css
   })
