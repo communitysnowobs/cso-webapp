@@ -2,3 +2,5 @@ node_modules
 .next
 .env
 _next
+
+.DS_Store
