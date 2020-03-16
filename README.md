@@ -4,7 +4,7 @@ Community Snow Observations's web application is an interactive platform for vie
 
 ## Getting Started
 
-CSO's web app is built using Facebook's React library, and Next.js, a framework for React development. Application state is managed using Redux, and Saga is utilzied to handle asynchronous updates.
+CSO's web app is built using Facebook's [React](https://github.com/facebook/react) library, and [Next.js](https://github.com/zeit/next.js), a framework for React development. Application state is managed using [Redux](https://github.com/reduxjs/redux), and [Saga](https://github.com/redux-saga/redux-saga) is utilzied to handle asynchronous updates.
 
 ### Running in development
 *The following steps can be followed using either yarn or npm*
@@ -57,7 +57,7 @@ Filters are used in the application to select relevant observations. Current fil
 
 ### UI
 
-UI components are separated into three scales. Small, resuable components are defined within the `components/atoms` folders. Compound components are defined in `components/molecules`. Very large components are defined in `components/cells`. This approach roughly conforms to the Atomic Design Methodology.
+UI components are separated into three scales. Small, resuable components are defined within the `components/atoms` folders. Compound components are defined in `components/molecules`. Very large components are defined in `components/cells`. This approach roughly conforms to the [Atomic Design Methodology](https://bradfrost.com/blog/post/atomic-web-design/).
 
 ### TODO
 
