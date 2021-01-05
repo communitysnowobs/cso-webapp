@@ -14,7 +14,7 @@
   "dependencies": {
     "@deck.gl/extensions": "^8.0.17",
     "@zeit/next-css": "^1.0.1",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "baseui": "^9.8.0",
     "deck.gl": "^8.0.17",
     "dotenv": "^8.2.0",
