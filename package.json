@@ -19,7 +19,7 @@
     "deck.gl": "^8.0.17",
     "dotenv": "^8.2.0",
     "js-file-download": "^0.4.9",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "nebula.gl": "^0.17.3",
     "next": "^9.1.1",
     "next-images": "^1.2.0",
